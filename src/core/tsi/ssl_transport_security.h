@@ -156,6 +156,8 @@ struct tsi_ssl_client_handshaker_options {
   tsi_tls_version min_tls_version;
   tsi_tls_version max_tls_version;
 
+  const char* crl_directory;
+  
   tsi_ssl_client_handshaker_options()
       : pem_key_cert_pair(nullptr),
         pem_root_certs(nullptr),
@@ -286,6 +288,8 @@ struct tsi_ssl_server_handshaker_options {
   tsi_tls_version min_tls_version;
   tsi_tls_version max_tls_version;
 
+  const char* crl_directory;
+  
   tsi_ssl_server_handshaker_options()
       : pem_key_cert_pairs(nullptr),
         num_key_cert_pairs(0),
