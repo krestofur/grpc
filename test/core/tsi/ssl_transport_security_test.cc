@@ -66,6 +66,12 @@ typedef enum AlpnMode {
   ALPN_CLIENT_SERVER_MISMATCH
 } AlpnMode;
 
+typedef enum CertValidity {
+  VALID,
+  BAD,
+  REVOKED,
+} CertValidity;
+
 typedef struct ssl_alpn_lib {
   AlpnMode alpn_mode;
   const char** server_alpn_protocols;
@@ -75,17 +81,20 @@ typedef struct ssl_alpn_lib {
 } ssl_alpn_lib;
 
 typedef struct ssl_key_cert_lib {
-  bool use_bad_server_cert;
-  bool use_bad_client_cert;
+  CertValidity client_cert_validity;
+  CertValidity server_cert_validity;
   bool use_root_store;
   char* root_cert;
   tsi_ssl_root_certs_store* root_store;
   tsi_ssl_pem_key_cert_pair* server_pem_key_cert_pairs;
   tsi_ssl_pem_key_cert_pair* bad_server_pem_key_cert_pairs;
+  tsi_ssl_pem_key_cert_pair* revoked_server_pem_key_cert_pairs;
   tsi_ssl_pem_key_cert_pair client_pem_key_cert_pair;
   tsi_ssl_pem_key_cert_pair bad_client_pem_key_cert_pair;
+  tsi_ssl_pem_key_cert_pair revoked_client_pem_key_cert_pair;
   uint16_t server_num_key_cert_pairs;
   uint16_t bad_server_num_key_cert_pairs;
+  uint16_t revoked_server_num_key_cert_pairs;
 } ssl_key_cert_lib;
 
 typedef struct ssl_tsi_test_fixture {
@@ -114,11 +123,27 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   tsi_ssl_client_handshaker_options client_options;
   client_options.pem_root_certs = key_cert_lib->root_cert;
   if (ssl_fixture->force_client_auth) {
-    client_options.pem_key_cert_pair =
-        key_cert_lib->use_bad_client_cert
-            ? &key_cert_lib->bad_client_pem_key_cert_pair
-            : &key_cert_lib->client_pem_key_cert_pair;
+    switch (key_cert_lib->client_cert_validity) {
+      case CertValidity::BAD:
+        client_options.pem_key_cert_pairs =
+            key_cert_lib->bad_client_pem_key_cert_pairs;
+        client_options.num_key_cert_pairs =
+            key_cert_lib->bad_client_num_key_cert_pairs;
+        break;
+      case CertValidity::REVOKED:
+        client_options.pem_key_cert_pairs =
+            key_cert_lib->revoked_client_pem_key_cert_pair;
+        client_options.num_key_cert_pairs =
+            key_cert_lib->revoked_client_num_key_cert_pair;
+        break;
+      default:
+        client_options.pem_key_cert_pairs =
+            key_cert_lib->client_pem_key_cert_pairs;
+        client_options.num_key_cert_pairs =
+            key_cert_lib->client_num_key_cert_pairs;
+    }
   }
+
   if (alpn_lib->alpn_mode == ALPN_CLIENT_NO_SERVER ||
       alpn_lib->alpn_mode == ALPN_CLIENT_SERVER_OK ||
       alpn_lib->alpn_mode == ALPN_CLIENT_SERVER_MISMATCH) {
@@ -146,14 +171,26 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
       server_options.num_alpn_protocols--;
     }
   }
-  server_options.pem_key_cert_pairs =
-      key_cert_lib->use_bad_server_cert
-          ? key_cert_lib->bad_server_pem_key_cert_pairs
-          : key_cert_lib->server_pem_key_cert_pairs;
-  server_options.num_key_cert_pairs =
-      key_cert_lib->use_bad_server_cert
-          ? key_cert_lib->bad_server_num_key_cert_pairs
-          : key_cert_lib->server_num_key_cert_pairs;
+  switch (key_cert_lib->server_cert_validity) {
+    case CertValidity::BAD:
+      server_options.pem_key_cert_pairs =
+          key_cert_lib->bad_server_pem_key_cert_pairs;
+      server_options.num_key_cert_pairs =
+          key_cert_lib->bad_server_num_key_cert_pairs;
+      break;
+    case CertValidity::REVOKED:
+      server_options.pem_key_cert_pairs =
+          key_cert_lib->revoked_server_pem_key_cert_pair;
+      server_options.num_key_cert_pairs =
+          key_cert_lib->revoked_server_num_key_cert_pair;
+      break;
+    default:
+      server_options.pem_key_cert_pairs =
+          key_cert_lib->server_pem_key_cert_pairs;
+      server_options.num_key_cert_pairs =
+          key_cert_lib->server_num_key_cert_pairs;
+  }
+
   server_options.pem_client_root_certs = key_cert_lib->root_cert;
   if (ssl_fixture->force_client_auth) {
     server_options.client_certificate_request =
@@ -342,12 +379,24 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   // handshake should succeed precisely when the server-side handshake
   // succeeds.
   bool expect_server_success =
-      !(key_cert_lib->use_bad_server_cert ||
-        (key_cert_lib->use_bad_client_cert && ssl_fixture->force_client_auth));
+      !(key_cert_lib->server_cert_validity == CertValidity::BAD ||
+        (key_cert_lib->client_cert_validity == CertValidity::BAD &&
+         ssl_fixture->force_client_auth));
+
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
-  bool expect_client_success = test_tls_version == tsi_tls_version::TSI_TLS1_2
-                                   ? expect_server_success
-                                   : !key_cert_lib->use_bad_server_cert;
+  bool expect_client_success =
+      test_tls_version == tsi_tls_version::TSI_TLS1_2
+          ? expect_server_success
+          : !(key_cert_lib->server_cert_validity == CertValidity::BAD);
+
+  // If neither the client/server have bad certificates, check if the client or
+  // server have revoked certificates
+  bool revoked_client_or_server =
+      key_cert_lib->server_cert_validity == CertValidity::REVOKED ||
+      key_cert_lib->client_cert_validity == CertValidity::REVOKED;
+  expect_client_success = expect_client_success && !revoked_client_or_server;
+  expect_server_success = expect_server_success && !revoked_client_or_server;
+
 #else
   bool expect_client_success = expect_server_success;
 #endif
@@ -484,6 +533,10 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badserver.key");
   key_cert_lib->bad_server_pem_key_cert_pairs[0].cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badserver.pem");
+  key_cert_lib->revoked_server_pem_key_cert_pairs[0].private_key =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "revokedserver.key");
+  key_cert_lib->revoked_server_pem_key_cert_pairs[0].cert_chain =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "revokedserver.pem");
   key_cert_lib->client_pem_key_cert_pair.private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "client.key");
   key_cert_lib->client_pem_key_cert_pair.cert_chain =
