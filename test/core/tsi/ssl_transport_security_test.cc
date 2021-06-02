@@ -545,6 +545,10 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badclient.key");
   key_cert_lib->bad_client_pem_key_cert_pair.cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badclient.pem");
+  key_cert_lib->revoked_client_pem_key_cert_pair.private_key =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "revokedclient.key");
+  key_cert_lib->revoked_client_pem_key_cert_pair.cert_chain =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "revokedclient.pem");
   key_cert_lib->root_cert = load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "ca.pem");
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
