@@ -456,14 +456,14 @@ static void ssl_test_destruct(tsi_test_fixture* fixture) {
   ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
   for (size_t i = 0; i < key_cert_lib->server_num_key_cert_pairs; i++) {
     ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->server_pem_key_cert_pairs[i]);
+        key_cert_lib->server_pem_key_cert_pair[i]);
   }
-  gpr_free(key_cert_lib->server_pem_key_cert_pairs);
+  gpr_free(key_cert_lib->server_pem_key_cert_pair);
   for (size_t i = 0; i < key_cert_lib->bad_server_num_key_cert_pairs; i++) {
     ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->bad_server_pem_key_cert_pairs[i]);
+        key_cert_lib->bad_server_pem_key_cert_pair[i]);
   }
-  gpr_free(key_cert_lib->bad_server_pem_key_cert_pairs);
+  gpr_free(key_cert_lib->bad_server_pem_key_cert_pair);
   ssl_test_pem_key_cert_pair_destroy(key_cert_lib->client_pem_key_cert_pair);
   ssl_test_pem_key_cert_pair_destroy(
       key_cert_lib->bad_client_pem_key_cert_pair);
