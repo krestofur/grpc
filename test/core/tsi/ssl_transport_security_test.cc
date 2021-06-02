@@ -125,22 +125,16 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   if (ssl_fixture->force_client_auth) {
     switch (key_cert_lib->client_cert_validity) {
       case CertValidity::BAD:
-        client_options.pem_key_cert_pair =
+        client_options.num_key_cert_pairs =
             &key_cert_lib->bad_client_pem_key_cert_pair;
-        client_options.num_key_cert_pair =
-            &key_cert_lib->bad_client_num_key_cert_pair;
         break;
       case CertValidity::REVOKED:
         client_options.pem_key_cert_pair =
             &key_cert_lib->revoked_client_pem_key_cert_pair;
-        client_options.num_key_cert_pair =
-            &key_cert_lib->revoked_client_num_key_cert_pair;
         break;
       default:
         client_options.pem_key_cert_pair =
             &key_cert_lib->client_pem_key_cert_pair;
-        client_options.num_key_cert_pair =
-            &key_cert_lib->client_num_key_cert_pair;
     }
   }
 
@@ -506,8 +500,8 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
   /* Create ssl_key_cert_lib. */
   ssl_key_cert_lib* key_cert_lib =
       static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
-  key_cert_lib->use_bad_server_cert = false;
-  key_cert_lib->use_bad_client_cert = false;
+  key_cert_lib->client_cert_validity = CertValidity::VALID;
+  key_cert_lib->server_cert_validity = CertValidity::VALID;
   key_cert_lib->use_root_store = false;
   key_cert_lib->server_num_key_cert_pair =
       SSL_TSI_TEST_SERVER_KEY_CERT_PAIRS_NUM;
