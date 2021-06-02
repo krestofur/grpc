@@ -63,6 +63,7 @@ grpc_cc_test(
     name = "ssl_transport_security_test",
     srcs = ["ssl_transport_security_test.cc"],
     data = [
+        "//src/core/tsi/test_creds:ab06acdd.r0",
         "//src/core/tsi/test_creds:badclient.key",
         "//src/core/tsi/test_creds:badclient.pem",
         "//src/core/tsi/test_creds:badserver.key",

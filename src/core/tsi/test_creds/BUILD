@@ -32,4 +32,5 @@ exports_files([
     "revokedclient.pem",
     "multi-domain.key",
     "multi-domain.pem",
+    "ab06acdd.r0",
 ])

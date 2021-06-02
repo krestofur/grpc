@@ -153,7 +153,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   client_options.min_tls_version = test_tls_version;
   client_options.max_tls_version = test_tls_version;
   if (ssl_fixture->force_client_auth) {
-      client_options.crl_directory = "src/core/tsi/test_creds/crl";
+      client_options.crl_directory = "src/core/tsi/test_creds/";
   }
   GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
                  &client_options, &ssl_fixture->client_handshaker_factory) ==
@@ -194,7 +194,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   if (ssl_fixture->force_client_auth) {
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
-      server_options.crl_directory = "src/core/tsi/test_creds/crl";
+      server_options.crl_directory = "src/core/tsi/test_creds/";
   } else {
     server_options.client_certificate_request =
         TSI_DONT_REQUEST_CLIENT_CERTIFICATE;
