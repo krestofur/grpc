@@ -127,7 +127,7 @@ multi-domain.pem -days 3650 -config multi-domain-openssl.cnf
 
 Generate the CRL file:
 ----------------------------------------------------------------------------
-openssl ca -gencrl -out current.crl -keyfile ca.key -cert ca.pem
+$ openssl ca -gencrl -out current.crl -keyfile ca.key -cert ca.pem
 
 Clean up:
 ---------
