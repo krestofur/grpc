@@ -168,21 +168,21 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   switch (key_cert_lib->server_cert_validity) {
     case CertValidity::BAD:
       server_options.pem_key_cert_pairs =
-          &key_cert_lib->bad_server_pem_key_cert_pair;
+          key_cert_lib->bad_server_pem_key_cert_pair;
       server_options.num_key_cert_pairs =
-          &key_cert_lib->bad_server_num_key_cert_pair;
+          key_cert_lib->bad_server_num_key_cert_pair;
       break;
     case CertValidity::REVOKED:
       server_options.pem_key_cert_pairs =
-          &key_cert_lib->revoked_server_pem_key_cert_pair;
+          key_cert_lib->revoked_server_pem_key_cert_pair;
       server_options.num_key_cert_pairs =
-          &key_cert_lib->revoked_server_num_key_cert_pair;
+          key_cert_lib->revoked_server_num_key_cert_pair;
       break;
     default:
       server_options.pem_key_cert_pairs =
-          &key_cert_lib->server_pem_key_cert_pair;
+          key_cert_lib->server_pem_key_cert_pair;
       server_options.num_key_cert_pairs =
-          &key_cert_lib->server_num_key_cert_pair;
+          key_cert_lib->server_num_key_cert_pair;
   }
 
   server_options.pem_client_root_certs = key_cert_lib->root_cert;
@@ -676,7 +676,7 @@ void ssl_tsi_test_do_handshake_with_bad_server_cert() {
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->use_bad_server_cert = true;
+  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::BAD;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
 }
@@ -686,7 +686,7 @@ void ssl_tsi_test_do_handshake_with_bad_client_cert() {
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->use_bad_client_cert = true;
+  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::BAD;
   ssl_fixture->force_client_auth = true;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
@@ -894,8 +894,8 @@ void test_tsi_ssl_server_handshaker_factory_refcounting() {
   cert_pair.private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server0.key");
   tsi_ssl_server_handshaker_options options;
-  options.pem_key_cert_pair = &cert_pair;
-  options.num_key_cert_pair = 1;
+  options.pem_key_cert_pairs = &cert_pair;
+  options.num_key_cert_pairs = 1;
   options.pem_client_root_certs = cert_chain;
 
   GPR_ASSERT(tsi_create_ssl_server_handshaker_factory_with_options(
