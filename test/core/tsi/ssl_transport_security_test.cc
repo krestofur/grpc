@@ -1104,6 +1104,8 @@ int main(int argc, char** argv) {
     ssl_tsi_test_do_handshake_with_wrong_server_name_indication();
     ssl_tsi_test_do_handshake_with_bad_server_cert();
     ssl_tsi_test_do_handshake_with_bad_client_cert();
+    ssl_tsi_test_do_handshake_with_revoked_server_cert;
+    ssl_tsi_test_do_handshake_with_revoked_client_cert;
 #ifdef OPENSSL_IS_BORINGSSL
     // BoringSSL and OpenSSL have different behaviors on mismatched ALPN.
     ssl_tsi_test_do_handshake_alpn_client_no_server();
