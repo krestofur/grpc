@@ -507,6 +507,8 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       SSL_TSI_TEST_SERVER_KEY_CERT_PAIRS_NUM;
   key_cert_lib->bad_server_num_key_cert_pair =
       SSL_TSI_TEST_BAD_SERVER_KEY_CERT_PAIRS_NUM;
+  key_cert_lib->revoked_server_num_key_cert_pair =
+      SSL_TSI_TEST_BAD_SERVER_KEY_CERT_PAIRS_NUM;
   key_cert_lib->server_pem_key_cert_pair =
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
@@ -515,6 +517,10 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                      key_cert_lib->bad_server_num_key_cert_pair));
+  key_cert_lib->revoked_server_pem_key_cert_pair =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(
+          gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
+                     key_cert_lib->revoked_server_num_key_cert_pair));
   key_cert_lib->server_pem_key_cert_pair[0].private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server0.key");
   key_cert_lib->server_pem_key_cert_pair[0].cert_chain =
