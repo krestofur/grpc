@@ -167,21 +167,21 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   }
   switch (key_cert_lib->server_cert_validity) {
     case CertValidity::BAD:
-      server_options.pem_key_cert_pair =
+      server_options.pem_key_cert_pairs =
           &key_cert_lib->bad_server_pem_key_cert_pair;
-      server_options.num_key_cert_pair =
+      server_options.num_key_cert_pairs =
           &key_cert_lib->bad_server_num_key_cert_pair;
       break;
     case CertValidity::REVOKED:
-      server_options.pem_key_cert_pair =
+      server_options.pem_key_cert_pairs =
           &key_cert_lib->revoked_server_pem_key_cert_pair;
-      server_options.num_key_cert_pair =
+      server_options.num_key_cert_pairs =
           &key_cert_lib->revoked_server_num_key_cert_pair;
       break;
     default:
-      server_options.pem_key_cert_pair =
+      server_options.pem_key_cert_pairs =
           &key_cert_lib->server_pem_key_cert_pair;
-      server_options.num_key_cert_pair =
+      server_options.num_key_cert_pairs =
           &key_cert_lib->server_num_key_cert_pair;
   }
 
