@@ -133,6 +133,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
             &key_cert_lib->revoked_client_pem_key_cert_pair;
         break;
       default:
+        gpr_log(GPR_INFO, "valid client key pair");
         client_options.pem_key_cert_pair =
             &key_cert_lib->client_pem_key_cert_pair;
     }
@@ -151,6 +152,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   }
   client_options.min_tls_version = test_tls_version;
   client_options.max_tls_version = test_tls_version;
+  client_options.crl_directory = "src/core/tsi/test_creds/crl";
   GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
                  &client_options, &ssl_fixture->client_handshaker_factory) ==
              TSI_OK);
@@ -179,6 +181,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
           key_cert_lib->revoked_server_num_key_cert_pair;
       break;
     default:
+      gpr_log(GPR_INFO, "valid server key pair");
       server_options.pem_key_cert_pairs =
           key_cert_lib->server_pem_key_cert_pair;
       server_options.num_key_cert_pairs =
@@ -197,7 +200,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   server_options.session_ticket_key_size = ssl_fixture->session_ticket_key_size;
   server_options.min_tls_version = test_tls_version;
   server_options.max_tls_version = test_tls_version;
-  server_options.crl_directory = "src/core/tsi/test_creds/crl"
+  server_options.crl_directory = "src/core/tsi/test_creds/crl";
   GPR_ASSERT(tsi_create_ssl_server_handshaker_factory_with_options(
                  &server_options, &ssl_fixture->server_handshaker_factory) ==
              TSI_OK);
