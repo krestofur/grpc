@@ -682,7 +682,7 @@ void ssl_tsi_test_do_handshake_with_bad_server_cert() {
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::BAD;
+  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::BAD;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
 }
@@ -693,6 +693,27 @@ void ssl_tsi_test_do_handshake_with_bad_client_cert() {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
   ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::BAD;
+  ssl_fixture->force_client_auth = true;
+  tsi_test_do_handshake(fixture);
+  tsi_test_fixture_destroy(fixture);
+}
+
+void ssl_tsi_test_do_handshake_with_revoked_server_cert() {
+  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_server_cert");
+  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
+  ssl_tsi_test_fixture* ssl_fixture =
+      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::REVOKED;
+  tsi_test_do_handshake(fixture);
+  tsi_test_fixture_destroy(fixture);
+}
+
+void ssl_tsi_test_do_handshake_with_revoked_client_cert() {
+  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_server_cert");
+  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
+  ssl_tsi_test_fixture* ssl_fixture =
+      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::REVOKED;
   ssl_fixture->force_client_auth = true;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
