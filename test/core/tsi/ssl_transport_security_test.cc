@@ -153,7 +153,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   client_options.min_tls_version = test_tls_version;
   client_options.max_tls_version = test_tls_version;
   if (ssl_fixture->force_client_auth) {
-      client_options.crl_directory = "src/core/tsi/test_creds/";
+    client_options.crl_directory = "src/core/tsi/test_creds/";
   }
   GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
                  &client_options, &ssl_fixture->client_handshaker_factory) ==
@@ -183,7 +183,6 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
           key_cert_lib->revoked_server_num_key_cert_pair;
       break;
     default:
-      gpr_log(GPR_INFO, "valid server key pair");
       server_options.pem_key_cert_pairs =
           key_cert_lib->server_pem_key_cert_pair;
       server_options.num_key_cert_pairs =
@@ -194,7 +193,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   if (ssl_fixture->force_client_auth) {
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
-      server_options.crl_directory = "src/core/tsi/test_creds/";
+    server_options.crl_directory = "src/core/tsi/test_creds/";
   } else {
     server_options.client_certificate_request =
         TSI_DONT_REQUEST_CLIENT_CERTIFICATE;
@@ -378,25 +377,22 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the client-side
   // handshake should succeed precisely when the server-side handshake
   // succeeds.
-  bool expect_server_success =
-      !(key_cert_lib->server_cert_validity == CertValidity::BAD ||
-        (key_cert_lib->client_cert_validity == CertValidity::BAD &&
-         ssl_fixture->force_client_auth));
+  const bool server_cert_validity_bad_or_revoked =
+      key_cert_lib->server_cert_validity == CertValidity::BAD ||
+      key_cert_lib->server_cert_validity == CertValidity::REVOKED;
+  const bool client_cert_validity_bad_or_revoked =
+      key_cert_lib->client_cert_validity == CertValidity::BAD ||
+      key_cert_lib->client_cert_validity == CertValidity::REVOKED;
+
+  bool expect_server_success = !(
+      server_cert_validity_bad_or_revoked ||
+      (client_cert_validity_bad_or_revoked && ssl_fixture->force_client_auth));
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
   bool expect_client_success =
       test_tls_version == tsi_tls_version::TSI_TLS1_2
           ? expect_server_success
-          : !(key_cert_lib->server_cert_validity == CertValidity::BAD);
-
-  // If neither the client/server have bad certificates, check if the client or
-  // server have revoked certificates
-  bool revoked_client_or_server =
-      key_cert_lib->server_cert_validity == CertValidity::REVOKED ||
-      key_cert_lib->client_cert_validity == CertValidity::REVOKED;
-  expect_client_success = expect_client_success && !revoked_client_or_server;
-  expect_server_success = expect_server_success && !revoked_client_or_server;
-
+          : !(server_cert_validity_bad_or_revoked);
 #else
   bool expect_client_success = expect_server_success;
 #endif
@@ -416,7 +412,8 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
       check_server1_peer(&peer);
     }
   } else {
-    GPR_ASSERT(ssl_fixture->base.client_result == nullptr);
+      gpr_log(GPR_INFO, "%p", ssl_fixture->base.client_result);
+      GPR_ASSERT(ssl_fixture->base.client_result == nullptr);
   }
   if (expect_server_success) {
     GPR_ASSERT(tsi_handshaker_result_extract_peer(
@@ -710,15 +707,18 @@ void ssl_tsi_test_do_handshake_with_revoked_server_cert() {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
   ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::REVOKED;
+  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::VALID;
+  ssl_fixture->force_client_auth = true;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
 }
 
 void ssl_tsi_test_do_handshake_with_revoked_client_cert() {
-  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_server_cert");
+  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_client_cert");
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::VALID;
   ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::REVOKED;
   ssl_fixture->force_client_auth = true;
   tsi_test_do_handshake(fixture);
