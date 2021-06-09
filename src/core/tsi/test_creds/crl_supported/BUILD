@@ -16,16 +16,9 @@ licenses(["notice"])  # Apache v2
 
 exports_files([
     "ca.pem",
-    "server1.key",
-    "server1.pem",
-    "server0.key",
-    "server0.pem",
-    "client.key",
-    "client.pem",
-    "badserver.key",
-    "badserver.pem",
-    "badclient.key",
-    "badclient.pem",
-    "multi-domain.key",
-    "multi-domain.pem",
+    "revoked.key",
+    "revoked.pem",
+    "valid.key",
+    "valid.pem",
+    "ab06acdd.r0",
 ])

@@ -9,6 +9,19 @@ $ openssl req -x509 -new -newkey rsa:2048 -nodes -keyout ca.key -out ca.pem \
   -config ca-openssl.cnf -days 3650 -extensions v3_req
 When prompted for certificate information, everything is default.
 
+valid is issued by CA:
+----------------------------------------------------------------------------
+
+$ openssl genrsa -out valid.key.rsa 2048
+$ openssl pkcs8 -topk8 -in valid.key.rsa -out valid.key -nocrypt
+$ openssl req -new -key valid.key -out valid.csr
+
+When prompted for certificate information, everything is default except the
+common name which is set to valid.
+
+$ openssl x509 -req -CA ca.pem -CAkey ca.key -CAcreateserial -in valid.csr \
+  -out valid.pem
+
 revoked is issued by CA:
 -----------------------
 
@@ -23,19 +36,6 @@ $ openssl x509 -req -CA ca.pem -CAkey ca.key -CAcreateserial -in revoked.csr \
   -out revoked.pem -days 3650
 
 $ openssl ca -revoke revoked.pem -keyfile ca.key -cert ca.pem
-
-valid is issued by CA and revoked:
-----------------------------------------------------------------------------
-
-$ openssl genrsa -out valid.key.rsa 2048
-$ openssl pkcs8 -topk8 -in valid.key.rsa -out valid.key -nocrypt
-$ openssl req -new -key valid.key -out valid.csr
-
-When prompted for certificate information, everything is default except the
-common name which is set to revokedserver.
-
-$ openssl x509 -req -CA ca.pem -CAkey ca.key -CAcreateserial -in revoked.csr \
-  -out revoked.pem
 
 $ openssl ca -revoke revokedserver.pem -keyfile ca.key -cert ca.pem
 

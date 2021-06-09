@@ -66,12 +66,6 @@ typedef enum AlpnMode {
   ALPN_CLIENT_SERVER_MISMATCH
 } AlpnMode;
 
-typedef enum CertValidity {
-  VALID,
-  BAD,
-  REVOKED,
-} CertValidity;
-
 typedef struct ssl_alpn_lib {
   AlpnMode alpn_mode;
   const char** server_alpn_protocols;
@@ -82,24 +76,29 @@ typedef struct ssl_alpn_lib {
 
 // Credentials created under the root SSL_TSI_TEST_CREDENTIALS_DIR/ca.pem
 typedef struct tsi_test_creds {
+  bool use_bad_server_cert;
+  bool use_bad_client_cert;
   char* root_cert;
   tsi_ssl_root_certs_store* root_store;
-  tsi_ssl_pem_key_cert_pair* server_pem_key_cert_pair;
-  tsi_ssl_pem_key_cert_pair* bad_server_pem_key_cert_pair;
+  tsi_ssl_pem_key_cert_pair* server_pem_key_cert_pairs;
+  tsi_ssl_pem_key_cert_pair* bad_server_pem_key_cert_pairs;
   tsi_ssl_pem_key_cert_pair client_pem_key_cert_pair;
   tsi_ssl_pem_key_cert_pair bad_client_pem_key_cert_pair;
-  uint16_t server_num_key_cert_pair;
-  uint16_t bad_server_num_key_cert_pair;
+  uint16_t server_num_key_cert_pairs;
+  uint16_t bad_server_num_key_cert_pairs;
 } tsi_test_creds;
 
 // Credentials created under the root
 // SSL_TSI_TEST_CREDENTIALS_DIR/crl_supported/ca.pem
 typedef struct tsi_crl_test_creds {
+  bool use_revoked_server_cert;
+  bool use_revoked_client_cert;
   char* root_cert;
   tsi_ssl_root_certs_store* root_store;
-  tsi_ssl_pem_key_cert_pair* revoked_cert;
-  tsi_ssl_pem_key_cert_pair valid_cert;
-  uint16_t revoked_server_num_key_cert_pair;
+  tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs;
+  tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs;
+  uint16_t revoked_num_key_cert_pairs;
+  uint16_t valid_num_key_cert_pairs;
 } tsi_crl_test_creds;
 
 typedef struct ssl_key_cert_lib {
@@ -107,12 +106,19 @@ typedef struct ssl_key_cert_lib {
   //   - true: will use certs from tsi_crl_test_creds
   //   - false: will use certs from tsi_test_creds
   bool use_crl_supported_certs;
-  CertValidity client_cert_validity;
-  CertValidity server_cert_validity;
   bool use_root_store;
   tsi_test_creds tsi_test_creds;
   tsi_crl_test_creds tsi_crl_test_creds;
 } ssl_key_cert_lib;
+
+typedef struct ssl_handshaker_certs {
+  const char* root_cert;
+  tsi_ssl_root_certs_store* root_store;
+  tsi_ssl_pem_key_cert_pair* server_pem_key_cert_pairs;
+  tsi_ssl_pem_key_cert_pair* client_pem_key_cert_pair;
+  uint16_t server_num_key_cert_pairs;
+  const char* crl_directory;
+} ssl_handshaker_certs;
 
 typedef struct ssl_tsi_test_fixture {
   tsi_test_fixture base;
@@ -128,6 +134,46 @@ typedef struct ssl_tsi_test_fixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 } ssl_tsi_test_fixture;
 
+static const ssl_handshaker_certs* get_ssl_handshaker_certs(
+    ssl_key_cert_lib* key_cert_lib) {
+  ssl_handshaker_certs* handshaker_certs =
+      static_cast<ssl_handshaker_certs*>(gpr_zalloc(sizeof(*handshaker_certs)));
+  if (key_cert_lib->use_crl_supported_certs) {
+    handshaker_certs->client_pem_key_cert_pair =
+        key_cert_lib->tsi_crl_test_creds.use_revoked_client_cert
+            ? key_cert_lib->tsi_crl_test_creds.revoked_pem_key_cert_pairs
+            : key_cert_lib->tsi_crl_test_creds.valid_pem_key_cert_pairs;
+
+    handshaker_certs->root_cert = key_cert_lib->tsi_crl_test_creds.root_cert;
+    handshaker_certs->root_store = key_cert_lib->tsi_crl_test_creds.root_store;
+
+    handshaker_certs->crl_directory = "src/core/tsi/test_creds/";
+
+    handshaker_certs->server_pem_key_cert_pairs =
+        key_cert_lib->tsi_crl_test_creds.use_revoked_server_cert
+            ? key_cert_lib->tsi_crl_test_creds.revoked_pem_key_cert_pairs
+            : key_cert_lib->tsi_crl_test_creds.valid_pem_key_cert_pairs;
+    handshaker_certs->server_num_key_cert_pairs =
+        key_cert_lib->tsi_crl_test_creds.use_revoked_server_cert
+            ? key_cert_lib->tsi_crl_test_creds.revoked_num_key_cert_pairs
+            : key_cert_lib->tsi_crl_test_creds.valid_num_key_cert_pairs;
+
+    return handshaker_certs;
+  }
+
+  handshaker_certs->server_pem_key_cert_pairs =
+      key_cert_lib->tsi_test_creds.use_bad_server_cert
+          ? key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs
+          : key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs;
+  handshaker_certs->server_num_key_cert_pairs =
+      key_cert_lib->tsi_test_creds.use_bad_server_cert
+          ? key_cert_lib->tsi_test_creds.bad_server_num_key_cert_pairs
+          : key_cert_lib->tsi_test_creds.server_num_key_cert_pairs;
+  handshaker_certs->root_cert = key_cert_lib->tsi_test_creds.root_cert;
+  handshaker_certs->root_store = key_cert_lib->tsi_test_creds.root_store;
+  return handshaker_certs;
+}
+
 static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
@@ -137,41 +183,14 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
   ssl_alpn_lib* alpn_lib = ssl_fixture->alpn_lib;
   /* Create client handshaker factory. */
-  tsi_ssl_pem_key_cert_pair client_cert;
-  tsi_ssl_pem_key_cert_pair* server_pem_key_cert_pair;
-  tsi_ssl_pem_key_cert_pair* client_pem_key_cert_pair;
-  uint16_t server_num_key_cert_pair;
-  uint16_t revoked_server_num_key_cert_pair;
-  tsi_ssl_root_certs_store* root_store;
-  if (key_cert_lib->use_crl_supported_certs) {
-    switch (key_cert_lib->client_cert_validity) {
-      case CertValidity::VALID:
-        client_pem_key_cert_pair = &key_cert_lib->tsi_crl_test_creds.valid_cert;
-        break;
-      case CertValidity::REVOKED:
-        client_pem_key_cert_pair =
-            &key_cert_lib->tsi_crl_test_creds.revoked_cert;
-        break;
-      default:
-    }
-  }
+  const ssl_handshaker_certs* handshaker_certs =
+      get_ssl_handshaker_certs(ssl_fixture->key_cert_lib);
+
   tsi_ssl_client_handshaker_options client_options;
-  client_options.pem_root_certs = key_cert_lib->root_cert;
+  client_options.pem_root_certs = handshaker_certs->root_cert;
   if (ssl_fixture->force_client_auth) {
-    switch (key_cert_lib->client_cert_validity) {
-      case CertValidity::BAD:
-        client_options.pem_key_cert_pair =
-            &key_cert_lib->tsi_test_creds.bad_client_pem_key_cert_pair;
-        break;
-      case CertValidity::REVOKED:
-        client_options.pem_key_cert_pair =
-            &key_cert_lib->tsi_crl_test_creds.revoked_client_pem_key_cert_pair;
-        client_options.crl_directory = "src/core/tsi/test_creds/";
-        break;
-      default:
-        client_options.pem_key_cert_pair =
-            &key_cert_lib->tsi_test_creds.client_pem_key_cert_pair;
-    }
+    client_options.pem_key_cert_pair =
+        handshaker_certs->client_pem_key_cert_pair;
   }
 
   if (alpn_lib->alpn_mode == ALPN_CLIENT_NO_SERVER ||
@@ -181,7 +200,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
     client_options.num_alpn_protocols = alpn_lib->num_client_alpn_protocols;
   }
   client_options.root_store =
-      key_cert_lib->use_root_store ? key_cert_lib->root_store : nullptr;
+      key_cert_lib->use_root_store ? handshaker_certs->root_store : nullptr;
   if (ssl_fixture->session_cache != nullptr) {
     client_options.session_cache = ssl_fixture->session_cache;
   }
@@ -201,32 +220,13 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
       server_options.num_alpn_protocols--;
     }
   }
-  switch (key_cert_lib->server_cert_validity) {
-    case CertValidity::BAD:
-      server_options.pem_key_cert_pairs =
-          key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pair;
-      server_options.num_key_cert_pairs =
-          key_cert_lib->tsi_test_creds.bad_server_num_key_cert_pair;
-      server_options.pem_client_root_certs =
-          key_cert_lib->tsi_test_creds.root_cert;
-      break;
-    case CertValidity::REVOKED:
-      server_options.pem_key_cert_pairs =
-          key_cert_lib->tsi_crl_test_creds.revoked_server_pem_key_cert_pair;
-      server_options.num_key_cert_pairs =
-          key_cert_lib->tsi_crl_test_creds.revoked_server_num_key_cert_pair;
-      server_options.pem_client_root_certs =
-          key_cert_lib->tsi_crl_test_creds.root_cert;
-      server_options.crl_directory = "src/core/tsi/test_creds/";
-      break;
-    default:
-      server_options.pem_key_cert_pairs =
-          key_cert_lib->tsi_test_creds.server_pem_key_cert_pair;
-      server_options.num_key_cert_pairs =
-          key_cert_lib->tsi_test_creds.server_num_key_cert_pair;
-      server_options.pem_client_root_certs =
-          key_cert_lib->tsi_test_creds.root_cert;
-  }
+
+  server_options.pem_key_cert_pairs =
+      handshaker_certs->server_pem_key_cert_pairs;
+  server_options.num_key_cert_pairs =
+      handshaker_certs->server_num_key_cert_pairs;
+  server_options.pem_client_root_certs = handshaker_certs->root_cert;
+
   if (ssl_fixture->force_client_auth) {
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
@@ -414,11 +414,15 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   // handshake should succeed precisely when the server-side handshake
   // succeeds.
   const bool server_cert_validity_bad_or_revoked =
-      key_cert_lib->server_cert_validity == CertValidity::BAD ||
-      key_cert_lib->server_cert_validity == CertValidity::REVOKED;
+      (!key_cert_lib->use_crl_supported_certs &&
+       key_cert_lib->tsi_test_creds.use_bad_server_cert) ||
+      (key_cert_lib->use_crl_supported_certs &&
+       key_cert_lib->tsi_crl_test_creds.use_revoked_server_cert);
   const bool client_cert_validity_bad_or_revoked =
-      key_cert_lib->client_cert_validity == CertValidity::BAD ||
-      key_cert_lib->client_cert_validity == CertValidity::REVOKED;
+      (!key_cert_lib->use_crl_supported_certs &&
+       key_cert_lib->tsi_test_creds.use_bad_client_cert) ||
+      (key_cert_lib->use_crl_supported_certs &&
+       key_cert_lib->tsi_crl_test_creds.use_revoked_client_cert);
 
   bool expect_server_success = !(
       server_cert_validity_bad_or_revoked ||
@@ -486,21 +490,24 @@ static void ssl_test_destruct(tsi_test_fixture* fixture) {
   gpr_free(alpn_lib);
   /* Destroy ssl_key_cert_lib. */
   ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
-  for (size_t i = 0; i < key_cert_lib->server_num_key_cert_pair; i++) {
+  for (size_t i = 0; i < key_cert_lib->tsi_test_creds.server_num_key_cert_pairs;
+       i++) {
     ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->server_pem_key_cert_pair[i]);
+        key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs[i]);
   }
-  gpr_free(key_cert_lib->server_pem_key_cert_pair);
-  for (size_t i = 0; i < key_cert_lib->bad_server_num_key_cert_pair; i++) {
+  gpr_free(key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs);
+  for (size_t i = 0;
+       i < key_cert_lib->tsi_test_creds.bad_server_num_key_cert_pairs; i++) {
     ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->bad_server_pem_key_cert_pair[i]);
+        key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs[i]);
   }
-  gpr_free(key_cert_lib->bad_server_pem_key_cert_pair);
-  ssl_test_pem_key_cert_pair_destroy(key_cert_lib->client_pem_key_cert_pair);
+  gpr_free(key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs);
   ssl_test_pem_key_cert_pair_destroy(
-      key_cert_lib->bad_client_pem_key_cert_pair);
-  gpr_free(key_cert_lib->root_cert);
-  tsi_ssl_root_certs_store_destroy(key_cert_lib->root_store);
+      key_cert_lib->tsi_test_creds.client_pem_key_cert_pair);
+  ssl_test_pem_key_cert_pair_destroy(
+      key_cert_lib->tsi_test_creds.bad_client_pem_key_cert_pair);
+  gpr_free(key_cert_lib->tsi_test_creds.root_cert);
+  tsi_ssl_root_certs_store_destroy(key_cert_lib->tsi_test_creds.root_store);
   gpr_free(key_cert_lib);
   if (ssl_fixture->session_cache != nullptr) {
     tsi_ssl_session_cache_unref(ssl_fixture->session_cache);
@@ -538,45 +545,50 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
   /* Create ssl_key_cert_lib. */
   ssl_key_cert_lib* key_cert_lib =
       static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
-  key_cert_lib->client_cert_validity = CertValidity::VALID;
-  key_cert_lib->server_cert_validity = CertValidity::VALID;
+  key_cert_lib->use_crl_supported_certs = false;
   key_cert_lib->use_root_store = false;
-  key_cert_lib->server_num_key_cert_pair =
+  key_cert_lib->tsi_test_creds.server_num_key_cert_pairs =
       SSL_TSI_TEST_SERVER_KEY_CERT_PAIRS_NUM;
-  key_cert_lib->bad_server_num_key_cert_pair =
+  key_cert_lib->tsi_test_creds.bad_server_num_key_cert_pairs =
       SSL_TSI_TEST_BAD_SERVER_KEY_CERT_PAIRS_NUM;
-  key_cert_lib->revoked_server_num_key_cert_pair =
+  key_cert_lib->tsi_crl_test_creds.revoked_num_key_cert_pairs =
       SSL_TSI_TEST_BAD_SERVER_KEY_CERT_PAIRS_NUM;
-  key_cert_lib->server_pem_key_cert_pair =
+  key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs =
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                     key_cert_lib->server_num_key_cert_pair));
-  key_cert_lib->bad_server_pem_key_cert_pair =
-      static_cast<tsi_ssl_pem_key_cert_pair*>(
-          gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                     key_cert_lib->bad_server_num_key_cert_pair));
-  key_cert_lib->revoked_server_pem_key_cert_pair =
-      static_cast<tsi_ssl_pem_key_cert_pair*>(
-          gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                     key_cert_lib->revoked_server_num_key_cert_pair));
-  key_cert_lib->tsi_test_creds.server_pem_key_cert_pair[0].private_key =
+                     key_cert_lib->tsi_test_creds.server_num_key_cert_pairs));
+  key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
+          sizeof(tsi_ssl_pem_key_cert_pair) *
+          key_cert_lib->tsi_test_creds.bad_server_num_key_cert_pairs));
+  key_cert_lib->tsi_crl_test_creds.revoked_pem_key_cert_pairs =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
+          sizeof(tsi_ssl_pem_key_cert_pair) *
+          key_cert_lib->tsi_crl_test_creds.revoked_num_key_cert_pairs));
+  key_cert_lib->tsi_crl_test_creds.valid_pem_key_cert_pairs =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
+          sizeof(tsi_ssl_pem_key_cert_pair) *
+          key_cert_lib->tsi_crl_test_creds.valid_num_key_cert_pairs));
+  key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs[0].private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server0.key");
-  key_cert_lib->tsi_test_creds.server_pem_key_cert_pair[0].cert_chain =
+  key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs[0].cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server0.pem");
-  key_cert_lib->tsi_test_creds.server_pem_key_cert_pair[1].private_key =
+  key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs[1].private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server1.key");
-  key_cert_lib->tsi_test_creds.server_pem_key_cert_pair[1].cert_chain =
+  key_cert_lib->tsi_test_creds.server_pem_key_cert_pairs[1].cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "server1.pem");
-  key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pair[0].private_key =
+  key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs[0].private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badserver.key");
-  key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pair[0].cert_chain =
+  key_cert_lib->tsi_test_creds.bad_server_pem_key_cert_pairs[0].cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badserver.pem");
-  key_cert_lib->tsi_test_creds.revoked_server_pem_key_cert_pair[0].private_key =
-      load_file(SSL_TSI_TEST_CREDENTIALS_DIR,
-                "crl_supported/revokedserver.key");
-  key_cert_lib->tsi_crl_test_creds.revoked_server_pem_key_cert_pair[0]
-      .cert_chain = load_file(SSL_TSI_TEST_CREDENTIALS_DIR,
-                              "crl_supported/revokedserver.pem");
+  key_cert_lib->tsi_crl_test_creds.revoked_pem_key_cert_pairs[0].private_key =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "crl_supported/revoked.key");
+  key_cert_lib->tsi_crl_test_creds.revoked_pem_key_cert_pairs[0].cert_chain =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "crl_supported/revoked.pem");
+  key_cert_lib->tsi_crl_test_creds.valid_pem_key_cert_pairs[0].private_key =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "crl_supported/valid.key");
+  key_cert_lib->tsi_crl_test_creds.valid_pem_key_cert_pairs[0].cert_chain =
+      load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "crl_supported/valid.pem");
   key_cert_lib->tsi_test_creds.client_pem_key_cert_pair.private_key =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "client.key");
   key_cert_lib->tsi_test_creds.client_pem_key_cert_pair.cert_chain =
@@ -585,20 +597,14 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badclient.key");
   key_cert_lib->tsi_test_creds.bad_client_pem_key_cert_pair.cert_chain =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "badclient.pem");
-  key_cert_lib->tsi_crl_test_creds.revoked_client_pem_key_cert_pair
-      .private_key = load_file(SSL_TSI_TEST_CREDENTIALS_DIR,
-                               "crl_supported/revokedclient.key");
-  key_cert_lib->tsi_crl_test_creds.revoked_client_pem_key_cert_pair.cert_chain =
-      load_file(SSL_TSI_TEST_CREDENTIALS_DIR,
-                "crl_supported/revokedclient.pem");
   key_cert_lib->tsi_test_creds.root_cert =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "ca.pem");
   key_cert_lib->tsi_test_creds.root_store =
-      tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
+      tsi_ssl_root_certs_store_create(key_cert_lib->tsi_test_creds.root_cert);
   key_cert_lib->tsi_crl_test_creds.root_cert =
       load_file(SSL_TSI_TEST_CREDENTIALS_DIR, "crl_supported/ca.pem");
-  key_cert_lib->tsi_crl_test_creds.root_store =
-      tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
+  key_cert_lib->tsi_crl_test_creds.root_store = tsi_ssl_root_certs_store_create(
+      key_cert_lib->tsi_crl_test_creds.root_cert);
   GPR_ASSERT(key_cert_lib->tsi_test_creds.root_store != nullptr);
   GPR_ASSERT(key_cert_lib->tsi_crl_test_creds.root_store != nullptr);
   ssl_fixture->key_cert_lib = key_cert_lib;
@@ -730,7 +736,7 @@ void ssl_tsi_test_do_handshake_with_bad_server_cert() {
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::BAD;
+  ssl_fixture->key_cert_lib->tsi_test_creds.use_bad_server_cert = true;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
 }
@@ -740,31 +746,7 @@ void ssl_tsi_test_do_handshake_with_bad_client_cert() {
   tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::BAD;
-  ssl_fixture->force_client_auth = true;
-  tsi_test_do_handshake(fixture);
-  tsi_test_fixture_destroy(fixture);
-}
-
-void ssl_tsi_test_do_handshake_with_revoked_server_cert() {
-  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_server_cert");
-  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
-  ssl_tsi_test_fixture* ssl_fixture =
-      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::REVOKED;
-  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::VALID;
-  ssl_fixture->force_client_auth = true;
-  tsi_test_do_handshake(fixture);
-  tsi_test_fixture_destroy(fixture);
-}
-
-void ssl_tsi_test_do_handshake_with_revoked_client_cert() {
-  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_client_cert");
-  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
-  ssl_tsi_test_fixture* ssl_fixture =
-      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->server_cert_validity = CertValidity::VALID;
-  ssl_fixture->key_cert_lib->client_cert_validity = CertValidity::REVOKED;
+  ssl_fixture->key_cert_lib->tsi_test_creds.use_bad_client_cert = true;
   ssl_fixture->force_client_auth = true;
   tsi_test_do_handshake(fixture);
   tsi_test_fixture_destroy(fixture);
@@ -1155,8 +1137,6 @@ int main(int argc, char** argv) {
     ssl_tsi_test_do_handshake_with_wrong_server_name_indication();
     ssl_tsi_test_do_handshake_with_bad_server_cert();
     ssl_tsi_test_do_handshake_with_bad_client_cert();
-    ssl_tsi_test_do_handshake_with_revoked_server_cert();
-    ssl_tsi_test_do_handshake_with_revoked_client_cert();
 #ifdef OPENSSL_IS_BORINGSSL
     // BoringSSL and OpenSSL have different behaviors on mismatched ALPN.
     ssl_tsi_test_do_handshake_alpn_client_no_server();
