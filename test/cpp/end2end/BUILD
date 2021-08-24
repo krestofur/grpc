@@ -108,6 +108,32 @@ grpc_cc_test(
 )
 
 grpc_cc_test(
+    name = "crl_end2end_test",
+    srcs = ["crl_end2end_test.cc"],
+    external_deps = [
+        "gtest",
+    ],
+    data = [
+        "//src/core/tsi/test_creds/crl_supported:ab06acdd.r0",
+        "//src/core/tsi/test_creds/crl_supported:ca.pem",
+        "//src/core/tsi/test_creds/crl_supported:revoked.key",
+        "//src/core/tsi/test_creds/crl_supported:revoked.pem",
+        "//src/core/tsi/test_creds/crl_supported:valid.key",
+        "//src/core/tsi/test_creds/crl_supported:valid.pem",
+    ],
+    tags = ["no_test_ios"],
+    deps = [
+        ":test_service_impl",
+        "//:grpc",
+        "//:grpc++",
+        "//:grpcpp_channelz",
+        "//src/proto/grpc/testing:echo_messages_proto",
+        "//src/proto/grpc/testing:echo_proto",
+        "//test/core/util:grpc_test_util",
+        "//test/cpp/util:test_util",
+    ],
+)
+grpc_cc_test(
     name = "client_crash_test",
     srcs = ["client_crash_test.cc"],
     data = [
