@@ -1717,6 +1717,16 @@ void tsi_ssl_client_handshaker_factory_unref(
   tsi_ssl_handshaker_factory_unref(&factory->base);
 }
 
+static int verify_cb(int ok, X509_STORE_CTX* ctx) {
+  int cert_error = X509_STORE_CTX_get_error(ctx);
+  if (cert_error != 0) {
+    std::string temp = "Certificate verify failed with code " +
+                       std::to_string(cert_error) + "\n";
+    gpr_log(GPR_INFO, "%s", temp.c_str());
+  }
+  return ok;
+}
+
 static void tsi_ssl_client_handshaker_factory_destroy(
     tsi_ssl_handshaker_factory* factory) {
   if (factory == nullptr) return;
@@ -2017,6 +2027,7 @@ tsi_result tsi_create_ssl_client_handshaker_factory_with_options(
     } else {
       X509_VERIFY_PARAM* param = X509_STORE_get0_param(cert_store);
       X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK);
+      X509_STORE_set_verify_cb(cert_store, verify_cb);
       gpr_log(GPR_INFO, "enabled client side CRL checking.");
     }
   }
