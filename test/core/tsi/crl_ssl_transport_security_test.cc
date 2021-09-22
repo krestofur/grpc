@@ -42,7 +42,7 @@ static const std::string kSslTsiTestCrlSupportedCredentialsDir =
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 // Credentials created under the root
-// SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR/crl_supported/ca.pem
+// kSslTsiTestCrlSupportedCredentialsDir/crl_supported/ca.pem
 // The CA root is also configured with KeyUsage cRLSign that the CA root in
 // tsi_test_creds does not contain
 typedef struct ssl_key_cert_lib {
@@ -230,10 +230,8 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
   /* Create ssl_key_cert_lib-> */
   ssl_key_cert_lib* key_cert_lib =
       static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
-  key_cert_lib->revoked_num_key_cert_pairs =
-      SSL_TSI_TEST_REVOKED_KEY_CERT_PAIRS_NUM;
-  key_cert_lib->valid_num_key_cert_pairs =
-      SSL_TSI_TEST_VALID_KEY_CERT_PAIRS_NUM;
+  key_cert_lib->revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
+  key_cert_lib->valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
   key_cert_lib->revoked_pem_key_cert_pairs =
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
@@ -243,18 +241,18 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                      key_cert_lib->valid_num_key_cert_pairs));
   key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
-      load_file(SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR, "revoked.key");
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key");
   key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
-      load_file(SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR, "revoked.pem");
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem");
   key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
-      load_file(SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR, "valid.key");
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.key");
   key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-      load_file(SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR, "valid.pem");
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
   key_cert_lib->root_cert =
-      load_file(SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR, "ca.pem");
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
-  key_cert_lib->crl_directory = SSL_TSI_TEST_CRL_SUPPORTED_CREDENTIALS_DIR;
+  key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
   GPR_ASSERT(key_cert_lib->root_store != nullptr);
   ssl_fixture->key_cert_lib = key_cert_lib;
   return &ssl_fixture->base;
