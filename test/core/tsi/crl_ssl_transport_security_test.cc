@@ -304,7 +304,7 @@ int main(int argc, char** argv) {
     // server.
     int test_result = RUN_ALL_TESTS();
     if (test_result() != 0) {
-      return test_result
+      return test_result;
     };
   }
   grpc_shutdown();
