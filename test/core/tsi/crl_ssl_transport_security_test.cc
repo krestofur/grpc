@@ -258,35 +258,40 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
   return &ssl_fixture->base;
 }
 
-void ssl_tsi_test_do_handshake_with_revoked_server_cert() {
-  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_server_cert");
-  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
-  ssl_tsi_test_fixture* ssl_fixture =
-      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->use_revoked_server_cert = true;
-  tsi_test_do_handshake(fixture);
-  tsi_test_fixture_destroy(fixture);
+class CrlSslTransportSecurityTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
+    ssl_tsi_test_fixture* ssl_fixture_ =
+        reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+  }
+
+  void TearDown() override { tsi_test_fixture_destroy(fixture); }
+
+  tsi_test_fixture* fixture_;
+  ssl_tsi_test_fixture* ssl_fixture_;
 }
 
-void ssl_tsi_test_do_handshake_with_revoked_client_cert() {
-  gpr_log(GPR_INFO, "ssl_tsi_test_do_handshake_with_revoked_client_cert");
-  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
-  ssl_tsi_test_fixture* ssl_fixture =
-      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  ssl_fixture->key_cert_lib->use_revoked_client_cert = true;
-  tsi_test_do_handshake(fixture);
-  tsi_test_fixture_destroy(fixture);
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  ssl_fixture_->key_cert_lib->use_revoked_server_cert = true;
+  tsi_test_do_handshake(fixture_);
+}
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  ssl_fixture_->key_cert_lib->use_revoked_client_cert = true;
+  tsi_test_do_handshake(fixture_);
 }
 
-void ssl_tsi_test_do_handshake_with_crl_checking_and_valid_traffic() {
-  gpr_log(GPR_INFO,
-          "ssl_tsi_test_do_handshake_with_crl_checking_and_valid_traffic");
-  tsi_test_fixture* fixture = ssl_tsi_test_fixture_create();
-  tsi_test_do_handshake(fixture);
-  tsi_test_fixture_destroy(fixture);
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  tsi_test_do_handshake(fixture_);
 }
 
 int main(int argc, char** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  RUN_ALL_TESTS();
+
   grpc::testing::TestEnvironment env(argc, argv);
   grpc_init();
   const size_t number_tls_versions = 2;
@@ -297,9 +302,7 @@ int main(int argc, char** argv) {
     test_tls_version = tls_versions[i];
     // Run all the tests using that TLS version for both the client and
     // server.
-    ssl_tsi_test_do_handshake_with_revoked_server_cert();
-    ssl_tsi_test_do_handshake_with_revoked_client_cert();
-    ssl_tsi_test_do_handshake_with_crl_checking_and_valid_traffic();
+    RUN_ALL_TESTS();
   }
   grpc_shutdown();
   return 0;
