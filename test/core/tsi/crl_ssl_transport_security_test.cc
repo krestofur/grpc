@@ -35,6 +35,8 @@ extern "C" {
 #include <openssl/pem.h>
 }
 
+using grpc_core::StringViewFromSlice;
+
 static const int kSslTsiTestRevokedKeyCertPairsNum = 1;
 static const int kSslTsiTestValidKeyCertPairsNum = 1;
 static const std::string kSslTsiTestCrlSupportedCredentialsDir =
