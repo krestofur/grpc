@@ -23,6 +23,7 @@
 
 #include "src/core/lib/iomgr/load_file.h"
 #include "src/core/lib/security/security_connector/security_connector.h"
+#include "src/core/lib/slice/slice_internal.h"
 #include "src/core/tsi/transport_security.h"
 #include "src/core/tsi/transport_security_interface.h"
 #include "test/core/tsi/transport_security_test_lib.h"
@@ -236,16 +237,16 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                      key_cert_lib->valid_num_key_cert_pairs));
-  key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
-      GetFileContents(kSslTsiTestCrlSupportedCredentialsDir + "revoked.key");
-  key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
-      GetFileContents(kSslTsiTestCrlSupportedCredentialsDir + "revoked.pem");
-  key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
-      GetFileContents(kSslTsiTestCrlSupportedCredentialsDir + "valid.key");
-  key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-      GetFileContents(kSslTsiTestCrlSupportedCredentialsDir + "valid.pem");
-  key_cert_lib->root_cert =
-      GetFileContents(kSslTsiTestCrlSupportedCredentialsDir + "ca.pem");
+  key_cert_lib->revoked_pem_key_cert_pairs[0].private_key = GetFileContents(
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key"));
+  key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain = GetFileContents(
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem"));
+  key_cert_lib->valid_pem_key_cert_pairs[0].private_key = GetFileContents(
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.key"));
+  key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain = GetFileContents(
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem"));
+  key_cert_lib->root_cert = GetFileContents(
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem"));
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
   key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
