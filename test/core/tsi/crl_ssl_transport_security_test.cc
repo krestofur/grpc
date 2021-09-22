@@ -71,7 +71,7 @@ typedef struct ssl_tsi_test_fixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 } ssl_tsi_test_fixture;
 
-static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
+void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
   ASSERT_NE(nullptr, ssl_fixture);
@@ -129,7 +129,7 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
                         &ssl_fixture->base.server_handshaker));
 }
 
-static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
+void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
   ASSERT_NE(nullptr, ssl_fixture);
@@ -172,12 +172,12 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   }
 }
 
-static void ssl_test_pem_key_cert_pair_destroy(tsi_ssl_pem_key_cert_pair kp) {
+void ssl_test_pem_key_cert_pair_destroy(tsi_ssl_pem_key_cert_pair kp) {
   gpr_free(const_cast<char*>(kp.private_key));
   gpr_free(const_cast<char*>(kp.cert_chain));
 }
 
-static void ssl_test_destruct(tsi_test_fixture* fixture) {
+void ssl_test_destruct(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
   if (ssl_fixture == nullptr) {
@@ -207,11 +207,11 @@ static void ssl_test_destruct(tsi_test_fixture* fixture) {
       ssl_fixture->client_handshaker_factory);
 }
 
-static const struct tsi_test_fixture_vtable vtable = {
-    ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
-    ssl_test_destruct};
+const struct tsi_test_fixture_vtable vtable = {ssl_test_setup_handshakers,
+                                               ssl_test_check_handshaker_peers,
+                                               ssl_test_destruct};
 
-static char* load_file(const char* dir_path, const char* file_name) {
+char* load_file(const char* dir_path, const char* file_name) {
   char* file_path = static_cast<char*>(
       gpr_zalloc(sizeof(char) * (strlen(dir_path) + strlen(file_name) + 1)));
   memcpy(file_path, dir_path, strlen(dir_path));
@@ -224,7 +224,7 @@ static char* load_file(const char* dir_path, const char* file_name) {
   return data;
 }
 
-static tsi_test_fixture* ssl_tsi_test_fixture_create() {
+tsi_test_fixture* ssl_tsi_test_fixture_create() {
   ssl_tsi_test_fixture* ssl_fixture =
       static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
   tsi_test_fixture_init(&ssl_fixture->base);
