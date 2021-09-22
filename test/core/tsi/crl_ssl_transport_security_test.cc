@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "absl/strings/str_join.h"
 #include "src/core/lib/iomgr/load_file.h"
 #include "src/core/lib/security/security_connector/security_connector.h"
 #include "src/core/lib/slice/slice_internal.h"
@@ -28,7 +29,6 @@
 #include "src/core/tsi/transport_security_interface.h"
 #include "test/core/tsi/transport_security_test_lib.h"
 #include "test/core/util/test_config.h"
-#include "third_party/absl/strings/str_join.h"
 
 extern "C" {
 #include <openssl/crypto.h>
