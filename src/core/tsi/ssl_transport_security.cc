@@ -2195,7 +2195,6 @@ tsi_result tsi_create_ssl_server_handshaker_factory_with_options(
         } else {
           X509_VERIFY_PARAM* param = X509_STORE_get0_param(cert_store);
           X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK);
-
           gpr_log(GPR_INFO, "enabled server CRL checking.");
         }
       }
