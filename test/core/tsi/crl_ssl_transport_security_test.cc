@@ -272,7 +272,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
-}
+};
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
@@ -304,7 +304,10 @@ int main(int argc, char** argv) {
     test_tls_version = tls_versions[i];
     // Run all the tests using that TLS version for both the client and
     // server.
-    RUN_ALL_TESTS();
+    int test_result = RUN_ALL_TESTS();
+    if (test_result() != 0) {
+      return test_result
+    };
   }
   grpc_shutdown();
   return 0;
