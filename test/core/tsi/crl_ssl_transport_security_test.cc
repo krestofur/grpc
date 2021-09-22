@@ -239,15 +239,22 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                      key_cert_lib->valid_num_key_cert_pairs));
   key_cert_lib->revoked_pem_key_cert_pairs[0].private_key = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key"));
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key")
+          .c_str());
   key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem"));
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem")
+          .c_str());
   key_cert_lib->valid_pem_key_cert_pairs[0].private_key = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.key"));
-  key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem"));
-  key_cert_lib->root_cert = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem"));
+      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.key")
+          .c_str());
+  key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
+      GetFileContents(
+          absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem"))
+          .c_str();
+  key_cert_lib->root_cert =
+      GetFileContents(
+          absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem"))
+          .c_str();
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
   key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
