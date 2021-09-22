@@ -74,8 +74,8 @@ typedef struct ssl_tsi_test_fixture {
 static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  GPR_ASSERT(ssl_fixture != nullptr);
-  GPR_ASSERT(ssl_fixture->key_cert_lib != nullptr);
+  ASSERT_NE(nullptr, ssl_fixture);
+  ASSERT_NE(nullptr, ssl_fixture->key_cert_lib);
   ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
   /* Create client handshaker factory. */
 
@@ -91,9 +91,9 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   client_options.root_store = key_cert_lib->root_store;
   client_options.min_tls_version = test_tls_version;
   client_options.max_tls_version = test_tls_version;
-  GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
-                 &client_options, &ssl_fixture->client_handshaker_factory) ==
-             TSI_OK);
+  ASSERT_EQ(TSI_OK,
+            tsi_create_ssl_client_handshaker_factory_with_options(
+                &client_options, &ssl_fixture->client_handshaker_factory));
   /* Create server handshaker factory. */
   tsi_ssl_server_handshaker_options server_options;
 
@@ -116,24 +116,24 @@ static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
   server_options.session_ticket_key_size = ssl_fixture->session_ticket_key_size;
   server_options.min_tls_version = test_tls_version;
   server_options.max_tls_version = test_tls_version;
-  GPR_ASSERT(tsi_create_ssl_server_handshaker_factory_with_options(
-                 &server_options, &ssl_fixture->server_handshaker_factory) ==
-             TSI_OK);
+  ASSERT_EQ(TSI_OK,
+            tsi_create_ssl_server_handshaker_factory_with_options(
+                &server_options, &ssl_fixture->server_handshaker_factory));
   /* Create server and client handshakers. */
-  GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
-                 ssl_fixture->client_handshaker_factory,
-                 ssl_fixture->server_name_indication,
-                 &ssl_fixture->base.client_handshaker) == TSI_OK);
-  GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
-                 ssl_fixture->server_handshaker_factory,
-                 &ssl_fixture->base.server_handshaker) == TSI_OK);
+  ASSERT_EQ(TSI_OK, tsi_ssl_client_handshaker_factory_create_handshaker(
+                        ssl_fixture->client_handshaker_factory,
+                        ssl_fixture->server_name_indication,
+                        &ssl_fixture->base.client_handshaker));
+  ASSERT_EQ(TSI_OK, tsi_ssl_server_handshaker_factory_create_handshaker(
+                        ssl_fixture->server_handshaker_factory,
+                        &ssl_fixture->base.server_handshaker));
 }
 
 static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
   ssl_tsi_test_fixture* ssl_fixture =
       reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  GPR_ASSERT(ssl_fixture != nullptr);
-  GPR_ASSERT(ssl_fixture->key_cert_lib != nullptr);
+  ASSERT_NE(nullptr, ssl_fixture);
+  ASSERT_NE(nullptr, ssl_fixture->key_cert_lib);
   ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
   tsi_peer peer;
 
@@ -157,18 +157,18 @@ static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
 #endif
 
   if (expect_client_success) {
-    GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                   ssl_fixture->base.client_result, &peer) == TSI_OK);
+    ASSERT_EQ(TSI_OK, tsi_handshaker_result_extract_peer(
+                          ssl_fixture->base.client_result, &peer));
     tsi_peer_destruct(&peer);
   } else {
-    GPR_ASSERT(ssl_fixture->base.client_result == nullptr);
+    ASSERT_EQ(nullptr, ssl_fixture->base.client_result);
   }
   if (expect_server_success) {
-    GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                   ssl_fixture->base.server_result, &peer) == TSI_OK);
+    ASSERT_EQ(TSI_OK, tsi_handshaker_result_extract_peer(
+                          ssl_fixture->base.server_result, &peer));
     tsi_peer_destruct(&peer);
   } else {
-    GPR_ASSERT(ssl_fixture->base.server_result == nullptr);
+    ASSERT_EQ(nullptr, ssl_fixture->base.server_result);
   }
 }
 
@@ -217,7 +217,7 @@ static char* load_file(const char* dir_path, const char* file_name) {
   memcpy(file_path, dir_path, strlen(dir_path));
   memcpy(file_path + strlen(dir_path), file_name, strlen(file_name));
   grpc_slice slice;
-  GPR_ASSERT(grpc_load_file(file_path, 1, &slice) == GRPC_ERROR_NONE);
+  ASSERT_EQ(GRPC_ERROR_NONE, grpc_load_file(file_path, 1, &slice));
   char* data = grpc_slice_to_c_string(slice);
   grpc_slice_unref(slice);
   gpr_free(file_path);
@@ -256,7 +256,7 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
   key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
-  GPR_ASSERT(key_cert_lib->root_store != nullptr);
+  ASSERT_NE(nullptr, key_cert_lib->root_store);
   ssl_fixture->key_cert_lib = key_cert_lib;
   return &ssl_fixture->base;
 }
