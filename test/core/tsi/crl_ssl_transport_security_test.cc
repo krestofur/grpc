@@ -28,6 +28,7 @@
 #include "src/core/tsi/transport_security_interface.h"
 #include "test/core/tsi/transport_security_test_lib.h"
 #include "test/core/util/test_config.h"
+#include "third_party/absl/strings/str_join.h"
 
 extern "C" {
 #include <openssl/crypto.h>
