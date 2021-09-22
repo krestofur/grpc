@@ -208,7 +208,7 @@ static const struct tsi_test_fixture_vtable vtable = {
     ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
     ssl_test_destruct};
 
-std::string GetFileContents(absl::string_view path) {
+std::string GetFileContents(const std::string& path) {
   grpc_slice slice = grpc_empty_slice();
   GPR_ASSERT(
       GRPC_LOG_IF_ERROR("load_file", grpc_load_file(path.c_str(), 0, &slice)));
