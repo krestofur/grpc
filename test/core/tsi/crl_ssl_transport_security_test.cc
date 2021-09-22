@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include "src/core/lib/iomgr/load_file.h"
 #include "src/core/lib/security/security_connector/security_connector.h"
 #include "src/core/tsi/transport_security.h"
