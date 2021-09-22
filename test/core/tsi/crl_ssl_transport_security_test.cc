@@ -36,7 +36,7 @@ extern "C" {
 static const int kSslTsiTestRevokedKeyCertPairsNum = 1;
 static const int kSslTsiTestValidKeyCertPairsNum = 1;
 const char* const kSslTsiTestCrlSupportedCredentialsDir =
-    "src/core/tsi/test_creds/crl_supported/";
+    "test/core/tsi/test_creds/";
 
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
