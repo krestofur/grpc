@@ -100,7 +100,10 @@ grpc_cc_test(
         "//test/core/tsi/test_creds:valid.pem",
     ],
     language = "C++",
-        tags = ["no_windows"],
+    tags = ["no_windows"],
+    external_deps = [
+        "gtest",
+    ],    
     deps = [
         ":transport_security_test_lib",
         "//:gpr",
