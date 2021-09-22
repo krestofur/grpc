@@ -265,8 +265,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   void SetUp() override {
     fixture_ = ssl_tsi_test_fixture_create();
-    ssl_tsi_test_fixture* ssl_fixture_ =
-        reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
+    ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
   }
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
