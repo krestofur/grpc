@@ -303,7 +303,7 @@ int main(int argc, char** argv) {
     // Run all the tests using that TLS version for both the client and
     // server.
     int test_result = RUN_ALL_TESTS();
-    if (test_result() != 0) {
+    if (test_result != 0) {
       return test_result;
     };
   }
