@@ -252,7 +252,7 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
-  // key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
+  key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
   GPR_ASSERT(key_cert_lib->root_store != nullptr);
   ssl_fixture->key_cert_lib = key_cert_lib;
   return &ssl_fixture->base;
