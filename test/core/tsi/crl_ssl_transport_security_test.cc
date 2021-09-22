@@ -292,8 +292,6 @@ TEST_F(CrlSslTransportSecurityTest,
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  RUN_ALL_TESTS();
-
   grpc::testing::TestEnvironment env(argc, argv);
   grpc_init();
   const size_t number_tls_versions = 2;
