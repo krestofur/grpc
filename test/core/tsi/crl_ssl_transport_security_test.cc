@@ -21,10 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "absl/strings/str_join.h"
 #include "src/core/lib/iomgr/load_file.h"
 #include "src/core/lib/security/security_connector/security_connector.h"
-#include "src/core/lib/slice/slice_internal.h"
 #include "src/core/tsi/transport_security.h"
 #include "src/core/tsi/transport_security_interface.h"
 #include "test/core/tsi/transport_security_test_lib.h"
@@ -34,8 +32,6 @@ extern "C" {
 #include <openssl/crypto.h>
 #include <openssl/pem.h>
 }
-
-using grpc_core::StringViewFromSlice;
 
 static const int kSslTsiTestRevokedKeyCertPairsNum = 1;
 static const int kSslTsiTestValidKeyCertPairsNum = 1;
@@ -212,13 +208,17 @@ static const struct tsi_test_fixture_vtable vtable = {
     ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
     ssl_test_destruct};
 
-std::string GetFileContents(const std::string& path) {
-  grpc_slice slice = grpc_empty_slice();
-  GPR_ASSERT(
-      GRPC_LOG_IF_ERROR("load_file", grpc_load_file(path.c_str(), 0, &slice)));
-  std::string credential = std::string(StringViewFromSlice(slice));
+static char* load_file(const char* dir_path, const char* file_name) {
+  char* file_path = static_cast<char*>(
+      gpr_zalloc(sizeof(char) * (strlen(dir_path) + strlen(file_name) + 1)));
+  memcpy(file_path, dir_path, strlen(dir_path));
+  memcpy(file_path + strlen(dir_path), file_name, strlen(file_name));
+  grpc_slice slice;
+  GPR_ASSERT(grpc_load_file(file_path, 1, &slice) == GRPC_ERROR_NONE);
+  char* data = grpc_slice_to_c_string(slice);
   grpc_slice_unref(slice);
-  return credential;
+  gpr_free(file_path);
+  return data;
 }
 
 static tsi_test_fixture* ssl_tsi_test_fixture_create() {
@@ -240,23 +240,16 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       static_cast<tsi_ssl_pem_key_cert_pair*>(
           gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                      key_cert_lib->valid_num_key_cert_pairs));
-  key_cert_lib->revoked_pem_key_cert_pairs[0].private_key = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key")
-          .c_str());
-  key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem")
-          .c_str());
-  key_cert_lib->valid_pem_key_cert_pairs[0].private_key = GetFileContents(
-      absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.key")
-          .c_str());
+  key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key");
+  key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem");
+  key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.key");
   key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-      GetFileContents(
-          absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem"))
-          .c_str();
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
   key_cert_lib->root_cert =
-      GetFileContents(
-          absl::StrJoin(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem"))
-          .c_str();
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
   key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
