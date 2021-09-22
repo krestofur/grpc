@@ -42,7 +42,7 @@ const char* const kSslTsiTestCrlSupportedCredentialsDir =
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 // Credentials created under the root
-// kSslTsiTestCrlSupportedCredentialsDir/crl_supported/ca.pem
+// kSslTsiTestCrlSupportedCredentialsDir/ca.pem
 // The CA root is also configured with KeyUsage cRLSign that the CA root in
 // tsi_test_creds does not contain
 typedef struct ssl_key_cert_lib {
@@ -252,7 +252,7 @@ static tsi_test_fixture* ssl_tsi_test_fixture_create() {
       load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
   key_cert_lib->root_store =
       tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
-  key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
+  // key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
   GPR_ASSERT(key_cert_lib->root_store != nullptr);
   ssl_fixture->key_cert_lib = key_cert_lib;
   return &ssl_fixture->base;
