@@ -281,13 +281,13 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_do_handshake(fixture_);
 }
 TEST_F(CrlSslTransportSecurityTest,
-       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+       ssl_tsi_test_do_handshake_with_revoked_client_cert) {
   ssl_fixture_->key_cert_lib->use_revoked_client_cert = true;
   tsi_test_do_handshake(fixture_);
 }
 
 TEST_F(CrlSslTransportSecurityTest,
-       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+       ssl_tsi_test_do_handshake_with_valid_certs) {
   tsi_test_do_handshake(fixture_);
 }
 
