@@ -226,12 +226,20 @@ static char* load_file(const char* dir_path, const char* file_name) {
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
-  CrlSslTransportSecurityTest()
-      : ssl_fixture_(absl::make_unique<ssl_tsi_test_fixture>()) {}
   void SetUp() override {
-    tsi_test_fixture_init(&ssl_fixture_->base);
-    ssl_fixture_->base.test_unused_bytes = true;
-    ssl_fixture_->base.vtable = &vtable;
+    fixture_ = ssl_tsi_test_fixture_create();
+    ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
+  }
+
+  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
+
+ private:
+  tsi_test_fixture* ssl_tsi_test_fixture_create() {
+    ssl_tsi_test_fixture* ssl_fixture =
+        static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
+    tsi_test_fixture_init(&ssl_fixture->base);
+    ssl_fixture->base.test_unused_bytes = true;
+    ssl_fixture->base.vtable = &vtable;
     /* Create ssl_key_cert_lib-> */
     ssl_key_cert_lib* key_cert_lib =
         static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
@@ -260,16 +268,12 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
     key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
     GPR_ASSERT(key_cert_lib->root_store != nullptr);
-    ssl_fixture_->key_cert_lib = key_cert_lib;
-    fixture_ = &ssl_fixture_->base;
+    ssl_fixture->key_cert_lib = key_cert_lib;
+    return &ssl_fixture->base;
   }
 
-  void ssl_tsi_test_fixture_initialize() {}
-
-  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
-
   tsi_test_fixture* fixture_;
-  std::unique_ptr<ssl_tsi_test_fixture> ssl_fixture_;
+  ssl_tsi_test_fixture* ssl_fixture_;
 };
 
 TEST_F(CrlSslTransportSecurityTest,
