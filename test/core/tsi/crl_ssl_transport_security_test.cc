@@ -230,11 +230,11 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   CrlSslTransportSecurityTest() {}
   void SetUp() override {
     vtable_ = absl::make_unique<tsi_test_fixture_vtable>();
-    vtable.setup_handshakers =
+    vtable_.setup_handshakers =
         &CrlSslTransportSecurityTest::ssl_test_setup_handshakers;
-    vtable.check_handshaker_peers =
+    vtable_.check_handshaker_peers =
         &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers;
-    vtable.destruct = &CrlSslTransportSecurityTest::ssl_test_destruct;
+    vtable_.destruct = &CrlSslTransportSecurityTest::ssl_test_destruct;
 
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
@@ -252,7 +252,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
     tsi_test_fixture_init(&ssl_fixture->base);
     ssl_fixture->base.test_unused_bytes = true;
-    ssl_fixture->base.vtable = &vtable_;
+    ssl_fixture->base.vtable = vtable_.get();
     /* Create ssl_key_cert_lib-> */
     ssl_key_cert_lib* key_cert_lib =
         static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
