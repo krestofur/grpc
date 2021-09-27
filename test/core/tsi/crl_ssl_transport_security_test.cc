@@ -222,11 +222,13 @@ static char* load_file(const char* dir_path, const char* file_name) {
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
-  CrlSslTransportSecurityTest() : void SetUp() override {
+  CrlSslTransportSecurityTest() {}
+  void SetUp() override {
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
-    vtable_ = {ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
-               ssl_test_destruct};
+    vtable_ = {.setup_handshakers = ssl_test_setup_handshakers,
+               .check_handshaker_peers = ssl_test_check_handshaker_peers,
+               .destruct = ssl_test_destruct};
   }
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
