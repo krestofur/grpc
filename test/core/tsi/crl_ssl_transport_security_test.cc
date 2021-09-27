@@ -227,23 +227,24 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   }
 
  protected:
-  CrlSslTransportSecurityTest()
-      : vtable_(
-            {.setup_handshakers =
-                 &CrlSslTransportSecurityTest::ssl_test_setup_handshakers,
-             .check_handshaker_peers =
-                 &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers,
-             .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct}) {}
+  CrlSslTransportSecurityTest() {}
   void SetUp() override {
+    vtable_ = absl::make_unique<tsi_test_fixture_vtable>();
+    vtable.setup_handshakers =
+        &CrlSslTransportSecurityTest::ssl_test_setup_handshakers;
+    vtable.check_handshaker_peers =
+        &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers;
+    vtable.destruct = &CrlSslTransportSecurityTest::ssl_test_destruct;
+
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
   }
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
 
+  const std::unique_ptr<tsi_test_fixture_vtable> vtable_;
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
-  struct tsi_test_fixture_vtable vtable_;
 
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
