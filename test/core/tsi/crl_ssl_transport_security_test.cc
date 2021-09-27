@@ -230,11 +230,11 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   CrlSslTransportSecurityTest() {}
   void SetUp() override {
     vtable_ = absl::make_unique<tsi_test_fixture_vtable>();
-    vtable_.setup_handshakers =
+    vtable_->setup_handshakers =
         &CrlSslTransportSecurityTest::ssl_test_setup_handshakers;
-    vtable_.check_handshaker_peers =
+    vtable_->check_handshaker_peers =
         &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers;
-    vtable_.destruct = &CrlSslTransportSecurityTest::ssl_test_destruct;
+    vtable_->destruct = &CrlSslTransportSecurityTest::ssl_test_destruct;
 
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
