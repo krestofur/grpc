@@ -233,6 +233,9 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
 
+  tsi_test_fixture* fixture_;
+  ssl_tsi_test_fixture* ssl_fixture_;
+
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
     ssl_tsi_test_fixture* ssl_fixture =
@@ -271,9 +274,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     ssl_fixture->key_cert_lib = key_cert_lib;
     return &ssl_fixture->base;
   }
-
-  tsi_test_fixture* fixture_;
-  ssl_tsi_test_fixture* ssl_fixture_;
 };
 
 TEST_F(CrlSslTransportSecurityTest,
