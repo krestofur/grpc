@@ -177,36 +177,6 @@ static void ssl_test_pem_key_cert_pair_destroy(tsi_ssl_pem_key_cert_pair kp) {
   gpr_free(const_cast<char*>(kp.cert_chain));
 }
 
-static void ssl_test_destruct(tsi_test_fixture* fixture) {
-  ssl_tsi_test_fixture* ssl_fixture =
-      reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
-  if (ssl_fixture == nullptr) {
-    return;
-  }
-  /* Destroy ssl_key_cert_lib-> */
-  ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
-  for (size_t i = 0; i < key_cert_lib->valid_num_key_cert_pairs; i++) {
-    ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->valid_pem_key_cert_pairs[i]);
-  }
-  gpr_free(key_cert_lib->valid_pem_key_cert_pairs);
-
-  for (size_t i = 0; i < key_cert_lib->revoked_num_key_cert_pairs; i++) {
-    ssl_test_pem_key_cert_pair_destroy(
-        key_cert_lib->revoked_pem_key_cert_pairs[i]);
-  }
-  gpr_free(key_cert_lib->revoked_pem_key_cert_pairs);
-
-  gpr_free(key_cert_lib->root_cert);
-  tsi_ssl_root_certs_store_destroy(key_cert_lib->root_store);
-  gpr_free(key_cert_lib);
-  /* Unreference others. */
-  tsi_ssl_server_handshaker_factory_unref(
-      ssl_fixture->server_handshaker_factory);
-  tsi_ssl_client_handshaker_factory_unref(
-      ssl_fixture->client_handshaker_factory);
-}
-
 static char* load_file(const char* dir_path, const char* file_name) {
   char* file_path = static_cast<char*>(
       gpr_zalloc(sizeof(char) * (strlen(dir_path) + strlen(file_name) + 1)));
@@ -236,6 +206,36 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
   const struct tsi_test_fixture_vtable vtable_;
+
+  void ssl_test_destruct(tsi_test_fixture* fixture) {
+    ssl_tsi_test_fixture* ssl_fixture =
+        reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+    if (ssl_fixture == nullptr) {
+      return;
+    }
+    /* Destroy ssl_key_cert_lib-> */
+    ssl_key_cert_lib* key_cert_lib = ssl_fixture->key_cert_lib;
+    for (size_t i = 0; i < key_cert_lib->valid_num_key_cert_pairs; i++) {
+      ssl_test_pem_key_cert_pair_destroy(
+          key_cert_lib->valid_pem_key_cert_pairs[i]);
+    }
+    gpr_free(key_cert_lib->valid_pem_key_cert_pairs);
+
+    for (size_t i = 0; i < key_cert_lib->revoked_num_key_cert_pairs; i++) {
+      ssl_test_pem_key_cert_pair_destroy(
+          key_cert_lib->revoked_pem_key_cert_pairs[i]);
+    }
+    gpr_free(key_cert_lib->revoked_pem_key_cert_pairs);
+
+    gpr_free(key_cert_lib->root_cert);
+    tsi_ssl_root_certs_store_destroy(key_cert_lib->root_store);
+    gpr_free(key_cert_lib);
+    /* Unreference others. */
+    tsi_ssl_server_handshaker_factory_unref(
+        ssl_fixture->server_handshaker_factory);
+    tsi_ssl_client_handshaker_factory_unref(
+        ssl_fixture->client_handshaker_factory);
+  }
 
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
