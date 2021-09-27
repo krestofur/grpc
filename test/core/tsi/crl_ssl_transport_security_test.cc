@@ -191,23 +191,7 @@ static char* load_file(const char* dir_path, const char* file_name) {
 }
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
- protected:
-  CrlSslTransportSecurityTest()
-      : vtable_({.setup_handshakers = ssl_test_setup_handshakers,
-                 .check_handshaker_peers = ssl_test_check_handshaker_peers,
-                 .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct}) {
-  }
-  void SetUp() override {
-    fixture_ = ssl_tsi_test_fixture_create();
-    ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
-  }
-
-  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
-
-  tsi_test_fixture* fixture_;
-  ssl_tsi_test_fixture* ssl_fixture_;
-  const struct tsi_test_fixture_vtable vtable_;
-
+ public:
   void ssl_test_destruct(tsi_test_fixture* fixture) {
     ssl_tsi_test_fixture* ssl_fixture =
         reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
@@ -237,6 +221,23 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     tsi_ssl_client_handshaker_factory_unref(
         ssl_fixture->client_handshaker_factory);
   }
+
+ protected:
+  CrlSslTransportSecurityTest()
+      : vtable_({.setup_handshakers = ssl_test_setup_handshakers,
+                 .check_handshaker_peers = ssl_test_check_handshaker_peers,
+                 .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct}) {
+  }
+  void SetUp() override {
+    fixture_ = ssl_tsi_test_fixture_create();
+    ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
+  }
+
+  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
+
+  tsi_test_fixture* fixture_;
+  ssl_tsi_test_fixture* ssl_fixture_;
+  const struct tsi_test_fixture_vtable vtable_;
 
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
