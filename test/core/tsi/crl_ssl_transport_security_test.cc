@@ -243,7 +243,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
-  const struct tsi_test_fixture_vtable vtable_;
+  struct tsi_test_fixture_vtable vtable_;
 
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
