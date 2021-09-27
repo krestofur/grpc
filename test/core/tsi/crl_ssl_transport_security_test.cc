@@ -207,10 +207,6 @@ static void ssl_test_destruct(tsi_test_fixture* fixture) {
       ssl_fixture->client_handshaker_factory);
 }
 
-static const struct tsi_test_fixture_vtable vtable = {
-    ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
-    ssl_test_destruct};
-
 static char* load_file(const char* dir_path, const char* file_name) {
   char* file_path = static_cast<char*>(
       gpr_zalloc(sizeof(char) * (strlen(dir_path) + strlen(file_name) + 1)));
@@ -229,12 +225,15 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   void SetUp() override {
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
+    vtable_ = {ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
+               ssl_test_destruct};
   }
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
 
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
+  const tsi_test_fixture_vtable vtable_;
 
  private:
   tsi_test_fixture* ssl_tsi_test_fixture_create() {
@@ -242,7 +241,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
     tsi_test_fixture_init(&ssl_fixture->base);
     ssl_fixture->base.test_unused_bytes = true;
-    ssl_fixture->base.vtable = &vtable;
+    ssl_fixture->base.vtable = &vtable_;
     /* Create ssl_key_cert_lib-> */
     ssl_key_cert_lib* key_cert_lib =
         static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
