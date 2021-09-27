@@ -222,58 +222,61 @@ static char* load_file(const char* dir_path, const char* file_name) {
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
+  CrlSslTransportSecurityTest()
+      : vtable_(ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
+                 ssl_test_destruct} {}
   void SetUp() override {
-    fixture_ = ssl_tsi_test_fixture_create();
-    ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
-    vtable_ = {ssl_test_setup_handshakers, ssl_test_check_handshaker_peers,
-               ssl_test_destruct};
-  }
+  fixture_ = ssl_tsi_test_fixture_create();
+  ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
+}
 
-  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
+  void TearDown() override {
+  tsi_test_fixture_destroy(fixture_);
+}
 
-  tsi_test_fixture* fixture_;
-  ssl_tsi_test_fixture* ssl_fixture_;
-  const tsi_test_fixture_vtable vtable_;
+tsi_test_fixture* fixture_;
+ssl_tsi_test_fixture* ssl_fixture_;
+const tsi_test_fixture_vtable vtable_;
 
- private:
-  tsi_test_fixture* ssl_tsi_test_fixture_create() {
-    ssl_tsi_test_fixture* ssl_fixture =
-        static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
-    tsi_test_fixture_init(&ssl_fixture->base);
-    ssl_fixture->base.test_unused_bytes = true;
-    ssl_fixture->base.vtable = &vtable_;
-    /* Create ssl_key_cert_lib-> */
-    ssl_key_cert_lib* key_cert_lib =
-        static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
-    key_cert_lib->revoked_num_key_cert_pairs =
-        kSslTsiTestRevokedKeyCertPairsNum;
-    key_cert_lib->valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
-    key_cert_lib->revoked_pem_key_cert_pairs =
-        static_cast<tsi_ssl_pem_key_cert_pair*>(
-            gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                       key_cert_lib->revoked_num_key_cert_pairs));
-    key_cert_lib->valid_pem_key_cert_pairs =
-        static_cast<tsi_ssl_pem_key_cert_pair*>(
-            gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                       key_cert_lib->valid_num_key_cert_pairs));
-    key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key");
-    key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem");
-    key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.key");
-    key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
-    key_cert_lib->root_cert =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
-    key_cert_lib->root_store =
-        tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
-    key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
-    GPR_ASSERT(key_cert_lib->root_store != nullptr);
-    ssl_fixture->key_cert_lib = key_cert_lib;
-    return &ssl_fixture->base;
-  }
-};
+private:
+tsi_test_fixture* ssl_tsi_test_fixture_create() {
+  ssl_tsi_test_fixture* ssl_fixture =
+      static_cast<ssl_tsi_test_fixture*>(gpr_zalloc(sizeof(*ssl_fixture)));
+  tsi_test_fixture_init(&ssl_fixture->base);
+  ssl_fixture->base.test_unused_bytes = true;
+  ssl_fixture->base.vtable = &vtable_;
+  /* Create ssl_key_cert_lib-> */
+  ssl_key_cert_lib* key_cert_lib =
+      static_cast<ssl_key_cert_lib*>(gpr_zalloc(sizeof(*key_cert_lib)));
+  key_cert_lib->revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
+  key_cert_lib->valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
+  key_cert_lib->revoked_pem_key_cert_pairs =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(
+          gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
+                     key_cert_lib->revoked_num_key_cert_pairs));
+  key_cert_lib->valid_pem_key_cert_pairs =
+      static_cast<tsi_ssl_pem_key_cert_pair*>(
+          gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
+                     key_cert_lib->valid_num_key_cert_pairs));
+  key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key");
+  key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem");
+  key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.key");
+  key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
+  key_cert_lib->root_cert =
+      load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
+  key_cert_lib->root_store =
+      tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
+  key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
+  GPR_ASSERT(key_cert_lib->root_store != nullptr);
+  ssl_fixture->key_cert_lib = key_cert_lib;
+  return &ssl_fixture->base;
+}
+}
+;
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
