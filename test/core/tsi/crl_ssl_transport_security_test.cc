@@ -242,7 +242,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
 
-  const std::unique_ptr<tsi_test_fixture_vtable> vtable_;
+  std::unique_ptr<tsi_test_fixture_vtable> vtable_;
   tsi_test_fixture* fixture_;
   ssl_tsi_test_fixture* ssl_fixture_;
 
