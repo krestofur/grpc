@@ -44,38 +44,35 @@ const char* const kSslTsiTestCrlSupportedCredentialsDir =
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
-namespace {
-
-// Credentials created under the root
-// kSslTsiTestCrlSupportedCredentialsDir/ca.pem
-// The CA root is also configured with KeyUsage cRLSign that the CA root in
-// tsi_test_creds does not contain
-typedef struct ssl_key_cert_lib {
-  bool use_revoked_server_cert;
-  bool use_revoked_client_cert;
-  char* root_cert;
-  tsi_ssl_root_certs_store* root_store;
-  tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs;
-  tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs;
-  uint16_t revoked_num_key_cert_pairs;
-  uint16_t valid_num_key_cert_pairs;
-  const char* crl_directory;
-} ssl_key_cert_lib;
-
-typedef struct ssl_tsi_test_fixture {
-  tsi_test_fixture base;
-  ssl_key_cert_lib* key_cert_lib;
-  char* server_name_indication;
-  bool session_reused;
-  const char* session_ticket_key;
-  size_t session_ticket_key_size;
-  tsi_ssl_server_handshaker_factory* server_handshaker_factory;
-  tsi_ssl_client_handshaker_factory* client_handshaker_factory;
-} ssl_tsi_test_fixture;
-}  // namespace
-
 class CrlSslTransportSecurityTest : public ::testing::Test {
  public:
+  // Credentials created under the root
+  // kSslTsiTestCrlSupportedCredentialsDir/ca.pem
+  // The CA root is also configured with KeyUsage cRLSign that the CA root in
+  // tsi_test_creds does not contain
+  typedef struct ssl_key_cert_lib {
+    bool use_revoked_server_cert;
+    bool use_revoked_client_cert;
+    char* root_cert;
+    tsi_ssl_root_certs_store* root_store;
+    tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs;
+    tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs;
+    uint16_t revoked_num_key_cert_pairs;
+    uint16_t valid_num_key_cert_pairs;
+    const char* crl_directory;
+  } ssl_key_cert_lib;
+
+  typedef struct ssl_tsi_test_fixture {
+    tsi_test_fixture base;
+    ssl_key_cert_lib* key_cert_lib;
+    char* server_name_indication;
+    bool session_reused;
+    const char* session_ticket_key;
+    size_t session_ticket_key_size;
+    tsi_ssl_server_handshaker_factory* server_handshaker_factory;
+    tsi_ssl_client_handshaker_factory* client_handshaker_factory;
+  } ssl_tsi_test_fixture;
+
   static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
     ssl_tsi_test_fixture* ssl_fixture =
         reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
