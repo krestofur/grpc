@@ -206,7 +206,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
                  &CrlSslTransportSecurityTest::ssl_test_setup_handshakers,
              .check_handshaker_peers =
                  &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers,
-             .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct}) {}
+             .destruct = ssl_test_destruct}) {}
   void SetUp() override {
     fixture_ = ssl_tsi_test_fixture_create();
     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
