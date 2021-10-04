@@ -246,17 +246,15 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   void SetUp() override {}
 
   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
-
-  tsi_test_fixture* fixture_;
-  SslTestFixture* ssl_fixture_;
 };
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
   SslTestFixture fixture = SslTestFixture(true, false);
   tsi_test_fixture* tsi_test_fixture =
-      reinterpret_cast<tsi_test_fixture*>(&fixture);
+      reinterpret_cast<struct tsi_test_fixture*>(&fixture);
   tsi_test_do_handshake(tsi_test_fixture);
+  tsi_test_fixture_destroy(tsi_test_fixture);
 }
 // TEST_F(CrlSslTransportSecurityTest,
 //        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
