@@ -46,10 +46,15 @@ static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 class SslTestFixture {
  public:
-  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert) {
+  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert) : {
+    vtable = {.setup_handshakers =
+                  &CrlSslTransportSecurityTest::ssl_test_setup_handshakers,
+              .check_handshaker_peers =
+                  &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers,
+              .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct};
     tsi_test_fixture_init(&base);
     base.test_unused_bytes = true;
-    base.vtable = &vtable_;
+    base.vtable = &vtable;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     revoked_pem_key_cert_pairs =
@@ -218,6 +223,7 @@ class SslTestFixture {
   }
 
   tsi_test_fixture base;
+  const struct tsi_test_fixture_vtable vtable_;
   bool use_revoked_server_cert;
   bool use_revoked_client_cert;
   char* root_cert;
