@@ -254,7 +254,9 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
   SslTestFixture fixture = SslTestFixture(true, false);
-  tsi_test_do_handshake(&fixture);
+  tsi_test_fixture* tsi_test_fixture =
+      reinterpret_cast<tsi_test_fixture*>(&fixture);
+  tsi_test_do_handshake(tsi_test_fixture);
 }
 // TEST_F(CrlSslTransportSecurityTest,
 //        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
