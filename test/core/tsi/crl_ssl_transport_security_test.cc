@@ -57,6 +57,8 @@ class SslTestFixture {
     base.vtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
+    use_revoked_client_cert = use_revoked_client_cert;
+    use_revoked_server_cert = use_revoked_server_cert;
     revoked_pem_key_cert_pairs =
         static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
             sizeof(tsi_ssl_pem_key_cert_pair) * revoked_num_key_cert_pairs));
@@ -238,32 +240,22 @@ class SslTestFixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
 
-// class CrlSslTransportSecurityTest : public ::testing::Test {
-//  protected:
-//   CrlSslTransportSecurityTest()
-//       : vtable_(
-//             {.setup_handshakers =
-//                  &CrlSslTransportSecurityTest::ssl_test_setup_handshakers,
-//              .check_handshaker_peers =
-//                  &CrlSslTransportSecurityTest::ssl_test_check_handshaker_peers,
-//              .destruct = &CrlSslTransportSecurityTest::ssl_test_destruct}) {}
-//   void SetUp() override {
-//     fixture_ = ssl_tsi_test_fixture_create();
-//     ssl_fixture_ = reinterpret_cast<ssl_tsi_test_fixture*>(fixture_);
-//   }
+class CrlSslTransportSecurityTest : public ::testing::Test {
+ protected:
+  CrlSslTransportSecurityTest() {}
+  void SetUp() override {}
 
-//   void TearDown() override { tsi_test_fixture_destroy(fixture_); }
+  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
 
-//   tsi_test_fixture* fixture_;
-//   ssl_tsi_test_fixture* ssl_fixture_;
-//   const struct tsi_test_fixture_vtable vtable_;
-// };
+  tsi_test_fixture* fixture_;
+  SslTestFixture* ssl_fixture_;
+};
 
-// TEST_F(CrlSslTransportSecurityTest,
-//        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
-//   ssl_fixture_->key_cert_lib->use_revoked_server_cert = true;
-//   tsi_test_do_handshake(fixture_);
-// }
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  SslTestFixture fixture = SslTestFixture(true, false);
+  tsi_test_do_handshake(&fixture);
+}
 // TEST_F(CrlSslTransportSecurityTest,
 //        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
 //   ssl_fixture_->key_cert_lib->use_revoked_client_cert = true;
@@ -275,23 +267,23 @@ class SslTestFixture {
 //   tsi_test_do_handshake(fixture_);
 // }
 
-// int main(int argc, char** argv) {
-//   ::testing::InitGoogleTest(&argc, argv);
-//   grpc::testing::TestEnvironment env(argc, argv);
-//   grpc_init();
-//   const size_t number_tls_versions = 2;
-//   const tsi_tls_version tls_versions[] = {tsi_tls_version::TSI_TLS1_2,
-//                                           tsi_tls_version::TSI_TLS1_3};
-//   for (size_t i = 0; i < number_tls_versions; i++) {
-//     // Set the TLS version to be used in the tests.
-//     test_tls_version = tls_versions[i];
-//     // Run all the tests using that TLS version for both the client and
-//     // server.
-//     int test_result = RUN_ALL_TESTS();
-//     if (test_result != 0) {
-//       return test_result;
-//     };
-//   }
-//   grpc_shutdown();
-//   return 0;
-// }
+int main(int argc, char** argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  grpc::testing::TestEnvironment env(argc, argv);
+  grpc_init();
+  const size_t number_tls_versions = 2;
+  const tsi_tls_version tls_versions[] = {tsi_tls_version::TSI_TLS1_2,
+                                          tsi_tls_version::TSI_TLS1_3};
+  for (size_t i = 0; i < number_tls_versions; i++) {
+    // Set the TLS version to be used in the tests.
+    test_tls_version = tls_versions[i];
+    // Run all the tests using that TLS version for both the client and
+    // server.
+    int test_result = RUN_ALL_TESTS();
+    if (test_result != 0) {
+      return test_result;
+    };
+  }
+  grpc_shutdown();
+  return 0;
+}
