@@ -232,7 +232,6 @@ class SslTestFixture {
   uint16_t valid_num_key_cert_pairs;
   const char* crl_directory;
   char* server_name_indication;
-  bool session_reused;
   const char* session_ticket_key;
   size_t session_ticket_key_size;
   tsi_ssl_server_handshaker_factory* server_handshaker_factory;
