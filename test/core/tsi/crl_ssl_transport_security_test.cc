@@ -57,8 +57,8 @@ class SslTestFixture {
     base.vtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
-    use_revoked_client_cert = use_revoked_client_cert;
-    use_revoked_server_cert = use_revoked_server_cert;
+    use_revoked_client_cert_ = use_revoked_client_cert_;
+    use_revoked_server_cert_ = use_revoked_server_cert_;
     revoked_pem_key_cert_pairs =
         static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
             sizeof(tsi_ssl_pem_key_cert_pair) * revoked_num_key_cert_pairs));
@@ -87,7 +87,7 @@ class SslTestFixture {
 
     tsi_ssl_client_handshaker_options client_options;
     client_options.pem_root_certs = ssl_fixture->root_cert;
-    if (ssl_fixture->use_revoked_client_cert) {
+    if (ssl_fixture->use_revoked_client_cert_) {
       client_options.pem_key_cert_pair =
           ssl_fixture->revoked_pem_key_cert_pairs;
     } else {
@@ -104,7 +104,7 @@ class SslTestFixture {
     /* Create server handshaker factory. */
     tsi_ssl_server_handshaker_options server_options;
 
-    if (ssl_fixture->use_revoked_server_cert) {
+    if (ssl_fixture->use_revoked_server_cert_) {
       server_options.pem_key_cert_pairs =
           ssl_fixture->revoked_pem_key_cert_pairs;
       server_options.num_key_cert_pairs =
@@ -151,12 +151,12 @@ class SslTestFixture {
     // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the client-side
     // handshake should succeed precisely when the server-side handshake
     // succeeds.
-    bool expect_server_success = !(ssl_fixture->use_revoked_server_cert ||
-                                   ssl_fixture->use_revoked_client_cert);
+    bool expect_server_success = !(ssl_fixture->use_revoked_server_cert_ ||
+                                   ssl_fixture->use_revoked_client_cert_);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
     bool expect_client_success = test_tls_version == tsi_tls_version::TSI_TLS1_2
                                      ? expect_server_success
-                                     : !(ssl_fixture->use_revoked_server_cert);
+                                     : !(ssl_fixture->use_revoked_server_cert_);
 #else
     bool expect_client_success = expect_server_success;
 #endif
@@ -224,8 +224,8 @@ class SslTestFixture {
 
   tsi_test_fixture base;
   const struct tsi_test_fixture_vtable vtable_;
-  bool use_revoked_server_cert;
-  bool use_revoked_client_cert;
+  bool use_revoked_server_cert_;
+  bool use_revoked_client_cert_;
   char* root_cert;
   tsi_ssl_root_certs_store* root_store;
   tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs;
@@ -258,7 +258,7 @@ TEST_F(CrlSslTransportSecurityTest,
 }
 // TEST_F(CrlSslTransportSecurityTest,
 //        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
-//   ssl_fixture_->key_cert_lib->use_revoked_client_cert = true;
+//   ssl_fixture_->key_cert_lib->use_revoked_client_cert_ = true;
 //   tsi_test_do_handshake(fixture_);
 // }
 
