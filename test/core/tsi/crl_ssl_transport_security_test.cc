@@ -245,7 +245,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   CrlSslTransportSecurityTest() {}
   void SetUp() override {}
 
-  void TearDown() override { tsi_test_fixture_destroy(fixture_); }
+  void TearDown() override {}
 };
 
 TEST_F(CrlSslTransportSecurityTest,
