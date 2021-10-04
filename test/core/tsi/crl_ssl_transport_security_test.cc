@@ -136,8 +136,7 @@ class SslTestFixture {
   }
 
   static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
-    ssl_tsi_test_fixture* ssl_fixture =
-        reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+    SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
     GPR_ASSERT(ssl_fixture != nullptr);
     tsi_peer peer;
 
@@ -182,8 +181,7 @@ class SslTestFixture {
   }
 
   static void ssl_test_destruct(tsi_test_fixture* fixture) {
-    ssl_tsi_test_fixture* ssl_fixture =
-        reinterpret_cast<ssl_tsi_test_fixture*>(fixture);
+    SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
     if (ssl_fixture == nullptr) {
       return;
     }
