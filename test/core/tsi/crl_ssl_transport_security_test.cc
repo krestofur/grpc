@@ -57,8 +57,8 @@ class SslTestFixture {
     base.vtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
-    use_revoked_client_cert_ = use_revoked_client_cert_;
-    use_revoked_server_cert_ = use_revoked_server_cert_;
+    use_revoked_client_cert_ = use_revoked_client_cert;
+    use_revoked_server_cert_ = use_revoked_server_cert;
     revoked_pem_key_cert_pairs =
         static_cast<tsi_ssl_pem_key_cert_pair*>(gpr_malloc(
             sizeof(tsi_ssl_pem_key_cert_pair) * revoked_num_key_cert_pairs));
