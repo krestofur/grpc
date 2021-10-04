@@ -237,7 +237,7 @@ class SslTestFixture {
   size_t session_ticket_key_size;
   tsi_ssl_server_handshaker_factory* server_handshaker_factory;
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
-}
+};
 
 // class CrlSslTransportSecurityTest : public ::testing::Test {
 //  protected:
