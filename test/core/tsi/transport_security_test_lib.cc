@@ -618,8 +618,11 @@ void tsi_test_fixture_init(tsi_test_fixture* fixture) {
 
 void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   if (fixture == nullptr) {
+    gpr_log(GPR_INFO, "BAD!");
     return;
   }
+  gpr_log(GPR_INFO, "DO tsi_test_fixture_destroy");
+
   tsi_test_frame_protector_config_destroy(fixture->config);
   tsi_handshaker_destroy(fixture->client_handshaker);
   tsi_handshaker_destroy(fixture->server_handshaker);
