@@ -44,7 +44,7 @@ const char* const kSslTsiTestCrlSupportedCredentialsDir =
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
-class SslTestFixture {
+class SslTestFixture : public tsi_test_fixture {
  public:
   SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert)
       : vtable_(
@@ -52,9 +52,10 @@ class SslTestFixture {
              .check_handshaker_peers =
                  &SslTestFixture::ssl_test_check_handshaker_peers,
              .destruct = &SslTestFixture::ssl_test_destruct}) {
-    tsi_test_fixture_init(&base);
-    base.test_unused_bytes = true;
-    base.vtable = &vtable_;
+    tsi_test_fixture* base = this;
+    tsi_test_fixture_init(base);
+    base->test_unused_bytes = true;
+    base->vtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     use_revoked_client_cert_ = use_revoked_client_cert;
