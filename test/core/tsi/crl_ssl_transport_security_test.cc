@@ -78,6 +78,9 @@ class SslTestFixture : public tsi_test_fixture {
     root_store = tsi_ssl_root_certs_store_create(root_cert);
     GPR_ASSERT(root_store != nullptr);
     crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
+    server_name_indication = nullptr;
+    session_ticket_key = nullptr;
+    session_ticket_key_size = 0;
   }
 
  private:
@@ -132,7 +135,7 @@ class SslTestFixture : public tsi_test_fixture {
     GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
                    ssl_fixture->client_handshaker_factory,
                    ssl_fixture->server_name_indication,
-                   &ssl_fixture->client_handshaker) == TSI_OK);
+                   &ssl_fixture->client_hyuandshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE1");
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
