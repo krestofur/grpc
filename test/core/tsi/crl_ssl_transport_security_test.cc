@@ -208,7 +208,6 @@ class SslTestFixture : public tsi_test_fixture {
 
     gpr_free(ssl_fixture->root_cert);
     tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
-    gpr_free(ssl_fixture);
     /* Unreference others. */
     tsi_ssl_server_handshaker_factory_unref(
         ssl_fixture->server_handshaker_factory);
