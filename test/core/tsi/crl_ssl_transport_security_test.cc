@@ -228,7 +228,7 @@ class SslTestFixture : public tsi_test_fixture {
     return data;
   }
 
-  static const tsi_test_fixture_vtable kVtable = {
+  static constexpr tsi_test_fixture_vtable kVtable = {
       &SslTestFixture::ssl_test_setup_handshakers,
       &SslTestFixture::ssl_test_check_handshaker_peers,
       &SslTestFixture::ssl_test_destruct};
