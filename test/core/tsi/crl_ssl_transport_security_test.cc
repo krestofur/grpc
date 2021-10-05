@@ -252,9 +252,16 @@ static struct tsi_test_fixture_vtable kVtable = {
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   CrlSslTransportSecurityTest() {}
-  void SetUp() override {}
+  void SetUp() override {
+    kVtable = {
+      &SslTestFixture::ssl_test_setup_handshakers,
+      &SslTestFixture::ssl_test_check_handshaker_peers,
+      &SslTestFixture::ssl_test_destruct
+    }
+  }
 
   void TearDown() override {}
+  struct tsi_test_fixture_vtable kVtable_;
 };
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -283,7 +290,7 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {
