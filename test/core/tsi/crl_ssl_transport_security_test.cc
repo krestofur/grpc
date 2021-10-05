@@ -41,11 +41,6 @@ static const int kSslTsiTestValidKeyCertPairsNum = 1;
 const char* const kSslTsiTestCrlSupportedCredentialsDir =
     "test/core/tsi/test_creds/";
 
-const static tsi_test_fixture_vtable kVtable = {
-    &SslTestFixture::ssl_test_setup_handshakers,
-    &SslTestFixture::ssl_test_check_handshaker_peers,
-    &SslTestFixture::ssl_test_destruct};
-
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
@@ -232,6 +227,11 @@ class SslTestFixture : public tsi_test_fixture {
     gpr_free(file_path);
     return data;
   }
+
+  const static struct tsi_test_fixture_vtable kVtable = {
+      &SslTestFixture::ssl_test_setup_handshakers,
+      &SslTestFixture::ssl_test_check_handshaker_peers,
+      &SslTestFixture::ssl_test_destruct};
 
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
