@@ -77,9 +77,9 @@ class SslTestFixture {
     root_store = tsi_ssl_root_certs_store_create(root_cert);
     GPR_ASSERT(root_store != nullptr);
     crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
-    // server_name_indication = nullptr;
-    // session_ticket_key = nullptr;
-    // session_ticket_key_size = 0;
+    server_name_indication = nullptr;
+    session_ticket_key = nullptr;
+    session_ticket_key_size = 0;
   }
 
  public:
