@@ -55,7 +55,7 @@ class SslTestFixture : public tsi_test_fixture {
     tsi_test_fixture* base = this;
     tsi_test_fixture_init(base);
     base->test_unused_bytes = true;
-    base->vtable = &vtable_;
+    basevtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     use_revoked_client_cert_ = use_revoked_client_cert;
@@ -229,7 +229,6 @@ class SslTestFixture : public tsi_test_fixture {
     return data;
   }
 
-  tsi_test_fixture base;
   const struct tsi_test_fixture_vtable vtable_;
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
@@ -274,8 +273,8 @@ TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture fixture = SslTestFixture(false, false);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
-  tsi_test_do_handshake(&fixture.base);
-  tsi_test_fixture_destroy(&fixture.base);
+  tsi_test_do_handshake(&fixture);
+  tsi_test_fixture_destroy(&fixture);
 }
 
 int main(int argc, char** argv) {
