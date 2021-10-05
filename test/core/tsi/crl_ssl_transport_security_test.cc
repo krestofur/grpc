@@ -272,7 +272,7 @@ TEST_F(CrlSslTransportSecurityTest,
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture* fixture = new SslTestFixture(false, false);
-  tsi_test_fixture* base = &fixture;
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
