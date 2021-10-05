@@ -46,11 +46,12 @@ static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 class SslTestFixture : public tsi_test_fixture {
  public:
-  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert) {
+  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert,
+                 tsi_test_fixture_vtable* vtable) {
     tsi_test_fixture* base = this;
     tsi_test_fixture_init(base);
     base->test_unused_bytes = true;
-    base->vtable = &kVtable;
+    base->vtable = vtable;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     use_revoked_client_cert_ = use_revoked_client_cert;
@@ -228,11 +229,6 @@ class SslTestFixture : public tsi_test_fixture {
     return data;
   }
 
-  static struct tsi_test_fixture_vtable kVtable = {
-      &SslTestFixture::ssl_test_setup_handshakers,
-      &SslTestFixture::ssl_test_check_handshaker_peers,
-      &SslTestFixture::ssl_test_destruct};
-
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
   char* root_cert;
@@ -248,6 +244,11 @@ class SslTestFixture : public tsi_test_fixture {
   tsi_ssl_server_handshaker_factory* server_handshaker_factory;
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
+
+static struct tsi_test_fixture_vtable kVtable = {
+    &SslTestFixture::ssl_test_setup_handshakers,
+    &SslTestFixture::ssl_test_check_handshaker_peers,
+    &SslTestFixture::ssl_test_destruct};
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
@@ -279,7 +280,7 @@ TEST_F(CrlSslTransportSecurityTest,
   // tsi_test_fixture* base =
   // reinterpret_cast<tsi_test_fixture*>(fixture.get());
 
-  SslTestFixture* fixture = new SslTestFixture(false, false);
+  SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
