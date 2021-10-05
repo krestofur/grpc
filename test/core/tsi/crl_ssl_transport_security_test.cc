@@ -271,12 +271,17 @@ TEST_F(CrlSslTransportSecurityTest,
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
-  std::unique_ptr<SslTestFixture> fixture =
-      absl::make_unique<SslTestFixture>(false, false);
-  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture.get());
+  // std::unique_ptr<SslTestFixture> fixture =
+  //     absl::make_unique<SslTestFixture>(false, false);
+  // tsi_test_fixture* base =
+  // reinterpret_cast<tsi_test_fixture*>(fixture.get());
+
+  SslTestFixture* fixture = new SslTestFixture(false, false);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  // tsi_test_fixture_destroy(base);
+  delete fixture;
 }
 
 int main(int argc, char** argv) {
