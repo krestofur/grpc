@@ -55,7 +55,7 @@ class SslTestFixture : public tsi_test_fixture {
     tsi_test_fixture* base = this;
     tsi_test_fixture_init(base);
     base->test_unused_bytes = true;
-    basevtable = &vtable_;
+    base->vtable = &vtable_;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     use_revoked_client_cert_ = use_revoked_client_cert;
@@ -135,11 +135,11 @@ class SslTestFixture : public tsi_test_fixture {
     GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
                    ssl_fixture->client_handshaker_factory,
                    ssl_fixture->server_name_indication,
-                   &ssl_fixture->base.client_handshaker) == TSI_OK);
+                   &ssl_fixture->client_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE1");
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
-                   &ssl_fixture->base.server_handshaker) == TSI_OK);
+                   &ssl_fixture->server_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE2");
   }
 
@@ -169,18 +169,18 @@ class SslTestFixture : public tsi_test_fixture {
 #endif
 
     if (expect_client_success) {
-      GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                     ssl_fixture->base.client_result, &peer) == TSI_OK);
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->client_result,
+                                                    &peer) == TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->base.client_result == nullptr);
+      GPR_ASSERT(ssl_fixture->client_result == nullptr);
     }
     if (expect_server_success) {
-      GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                     ssl_fixture->base.server_result, &peer) == TSI_OK);
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->server_result,
+                                                    &peer) == TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->base.server_result == nullptr);
+      GPR_ASSERT(ssl_fixture->server_result == nullptr);
     }
   }
 
