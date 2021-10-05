@@ -186,12 +186,12 @@ class SslTestFixture : public tsi_test_fixture {
   }
 
   static void ssl_test_destruct(tsi_test_fixture* fixture) {
-    SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
-    gpr_log(GPR_INFO, "DO ssl_test_destruct");
+    // SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
+    // gpr_log(GPR_INFO, "DO ssl_test_destruct");
 
-    if (ssl_fixture == nullptr) {
-      return;
-    }
+    // if (ssl_fixture == nullptr) {
+    //   return;
+    // }
 
     // for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
     //   ssl_test_pem_key_cert_pair_destroy(
