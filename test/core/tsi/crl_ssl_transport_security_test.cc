@@ -275,7 +275,7 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {
