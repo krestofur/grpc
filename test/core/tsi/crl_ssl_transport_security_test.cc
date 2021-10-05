@@ -257,14 +257,14 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   void TearDown() override {}
 };
 
-// TEST_F(CrlSslTransportSecurityTest,
-//        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
-//   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
-//   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-//   gpr_log(GPR_INFO, "DO HANDSHAKE");
-//   tsi_test_do_handshake(base);
-//   tsi_test_fixture_destroy(base);
-// }
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  gpr_log(GPR_INFO, "DO HANDSHAKE");
+  tsi_test_do_handshake(base);
+  tsi_test_fixture_destroy(base);
+}
 // TEST_F(CrlSslTransportSecurityTest,
 //        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
 //   ssl_fixture_->key_cert_lib->use_revoked_client_cert_ = true;
@@ -282,7 +282,7 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {
