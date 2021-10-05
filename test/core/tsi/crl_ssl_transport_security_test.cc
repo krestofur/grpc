@@ -74,9 +74,9 @@ class SslTestFixture : public tsi_test_fixture {
     root_store = tsi_ssl_root_certs_store_create(root_cert);
     GPR_ASSERT(root_store != nullptr);
     crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
-    server_name_indication = nullptr;
-    session_ticket_key = nullptr;
-    session_ticket_key_size = 0;
+    // server_name_indication = nullptr;
+    // session_ticket_key = nullptr;
+    // session_ticket_key_size = 0;
   }
 
  public:
@@ -192,7 +192,6 @@ class SslTestFixture : public tsi_test_fixture {
     if (ssl_fixture == nullptr) {
       return;
     }
-    gpr_log(GPR_INFO, "DO ssl_test_destruct2");
 
     for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
       ssl_test_pem_key_cert_pair_destroy(
@@ -262,14 +261,14 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
   SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -277,7 +276,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  // tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {
