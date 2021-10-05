@@ -75,12 +75,11 @@ class SslTestFixture {
         load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
     root_cert = load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
     root_store = tsi_ssl_root_certs_store_create(root_cert);
+    GPR_ASSERT(root_store != nullptr);
     crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
     server_name_indication = nullptr;
     session_ticket_key = nullptr;
     session_ticket_key_size = 0;
-
-    GPR_ASSERT(root_store != nullptr);
   }
 
  private:
@@ -274,7 +273,7 @@ TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture fixture = SslTestFixture(false, false);
   tsi_test_fixture* tsi_test_fixture =
-      reinterpret_cast<struct tsi_test_fixture*>(&fixture);
+      reinterpret_cast<struct tsi_test_fixture*>(&fixture.base);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(tsi_test_fixture);
   tsi_test_fixture_destroy(tsi_test_fixture);
