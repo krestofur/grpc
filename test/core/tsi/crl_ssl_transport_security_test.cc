@@ -147,6 +147,7 @@ class SslTestFixture {
     SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
     GPR_ASSERT(ssl_fixture != nullptr);
     tsi_peer peer;
+    gpr_log(GPR_INFO, "CHECJ HANDHSKAPER PER");
 
     // In TLS 1.3, the client-side handshake succeeds even if the client sends a
     // revoked certificate. In such a case, the server would fail the TLS
@@ -257,6 +258,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
   SslTestFixture fixture = SslTestFixture(true, false);
+  gpr_log(GPR_INFO, "HERE3");
   tsi_test_fixture* tsi_test_fixture =
       reinterpret_cast<struct tsi_test_fixture*>(&fixture);
   tsi_test_do_handshake(tsi_test_fixture);
