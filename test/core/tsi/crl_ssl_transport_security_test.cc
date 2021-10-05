@@ -261,26 +261,21 @@ TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-  gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
 }
-// TEST_F(CrlSslTransportSecurityTest,
-//        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
-//   ssl_fixture_->key_cert_lib->use_revoked_client_cert_ = true;
-//   tsi_test_do_handshake(fixture_);
-// }
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_client_cert) {
+  SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  tsi_test_do_handshake(base);
+  tsi_test_fixture_destroy(base);
+}
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
-  // std::unique_ptr<SslTestFixture> fixture =
-  //     absl::make_unique<SslTestFixture>(false, false);
-  // tsi_test_fixture* base =
-  // reinterpret_cast<tsi_test_fixture*>(fixture.get());
-
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-  gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
 }
