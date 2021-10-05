@@ -46,8 +46,11 @@ static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 class SslTestFixture : public tsi_test_fixture {
  public:
-  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert,
-                 tsi_test_fixture_vtable* vtable) {
+  SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert) {
+    struct tsi_test_fixture_vtable vTable = {
+        this->ssl_test_setup_handshakers, this->ssl_test_check_handshaker_peers,
+        this->ssl_test_destruct};
+
     tsi_test_fixture* base = this;
     tsi_test_fixture_init(base);
     base->test_unused_bytes = true;
@@ -242,11 +245,6 @@ class SslTestFixture : public tsi_test_fixture {
   tsi_ssl_server_handshaker_factory* server_handshaker_factory;
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
-
-static struct tsi_test_fixture_vtable kVtable = {
-    &SslTestFixture::ssl_test_setup_handshakers,
-    &SslTestFixture::ssl_test_check_handshaker_peers,
-    &SslTestFixture::ssl_test_destruct};
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
