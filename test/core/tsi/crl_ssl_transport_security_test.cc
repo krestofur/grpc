@@ -193,20 +193,20 @@ class SslTestFixture : public tsi_test_fixture {
       return;
     }
 
-    for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
-      ssl_test_pem_key_cert_pair_destroy(
-          ssl_fixture->valid_pem_key_cert_pairs[i]);
-    }
-    gpr_free(ssl_fixture->valid_pem_key_cert_pairs);
+    // for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
+    //   ssl_test_pem_key_cert_pair_destroy(
+    //       ssl_fixture->valid_pem_key_cert_pairs[i]);
+    // }
+    // gpr_free(ssl_fixture->valid_pem_key_cert_pairs);
 
-    for (size_t i = 0; i < ssl_fixture->revoked_num_key_cert_pairs; i++) {
-      ssl_test_pem_key_cert_pair_destroy(
-          ssl_fixture->revoked_pem_key_cert_pairs[i]);
-    }
-    gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
+    // for (size_t i = 0; i < ssl_fixture->revoked_num_key_cert_pairs; i++) {
+    //   ssl_test_pem_key_cert_pair_destroy(
+    //       ssl_fixture->revoked_pem_key_cert_pairs[i]);
+    // }
+    // gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
 
-    gpr_free(ssl_fixture->root_cert);
-    tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
+    // gpr_free(ssl_fixture->root_cert);
+    // tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
     // /* Unreference others. */
     // tsi_ssl_server_handshaker_factory_unref(
     //     ssl_fixture->server_handshaker_factory);
