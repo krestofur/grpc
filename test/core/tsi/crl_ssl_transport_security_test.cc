@@ -281,7 +281,6 @@ TEST_F(CrlSslTransportSecurityTest,
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
   // tsi_test_fixture_destroy(base);
-  delete fixture;
 }
 
 int main(int argc, char** argv) {
