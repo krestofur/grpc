@@ -244,17 +244,17 @@ class SslTestFixture : public tsi_test_fixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
 
+static struct tsi_test_fixture_vtable kVtable = {
+    &SslTestFixture::ssl_test_setup_handshakers,
+    &SslTestFixture::ssl_test_check_handshaker_peers,
+    &SslTestFixture::ssl_test_destruct};
+
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   CrlSslTransportSecurityTest() {}
-  void SetUp() override {
-    vTable_ = {&SslTestFixture::ssl_test_setup_handshakers,
-               &SslTestFixture::ssl_test_check_handshaker_peers,
-               &SslTestFixture::ssl_test_destruct};
-  }
+  void SetUp() override {}
 
   void TearDown() override {}
-  struct tsi_test_fixture_vtable vTable_;
 };
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -279,7 +279,7 @@ TEST_F(CrlSslTransportSecurityTest,
   // tsi_test_fixture* base =
   // reinterpret_cast<tsi_test_fixture*>(fixture.get());
 
-  SslTestFixture* fixture = new SslTestFixture(false, false, &vTable_);
+  SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(base);
