@@ -274,7 +274,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture fixture = SslTestFixture(false, false);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
   tsi_test_do_handshake(&fixture.base);
-  tsi_test_fixture_destroy(tsi_test_fixture);
+  tsi_test_fixture_destroy(&fixture.base);
 }
 
 int main(int argc, char** argv) {
