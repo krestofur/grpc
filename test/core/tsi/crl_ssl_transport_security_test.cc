@@ -229,8 +229,9 @@ class SslTestFixture : public tsi_test_fixture {
   }
 
   static const tsi_test_fixture_vtable kVtable = {
-      &SslTestFixture::SetupHandshakers, &SslTestFixture::CheckHandshakerPeers,
-      &SslTestFixture::Destroy};
+      &SslTestFixture::ssl_test_setup_handshakers,
+      &SslTestFixture::ssl_test_check_handshaker_peers,
+      &SslTestFixture::ssl_test_destruct};
 
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
