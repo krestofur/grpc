@@ -136,9 +136,11 @@ class SslTestFixture {
                    ssl_fixture->client_handshaker_factory,
                    ssl_fixture->server_name_indication,
                    &ssl_fixture->base.client_handshaker) == TSI_OK);
+    gpr_log(GPR_INFO, "HERE1");
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
                    &ssl_fixture->base.server_handshaker) == TSI_OK);
+    gpr_log(GPR_INFO, "HERE2");
   }
 
   static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
