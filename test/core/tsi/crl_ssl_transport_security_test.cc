@@ -253,11 +253,9 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   CrlSslTransportSecurityTest() {}
   void SetUp() override {
-    kVtable = {
-      &SslTestFixture::ssl_test_setup_handshakers,
-      &SslTestFixture::ssl_test_check_handshaker_peers,
-      &SslTestFixture::ssl_test_destruct
-    }
+    kVtable = {&SslTestFixture::ssl_test_setup_handshakers,
+               &SslTestFixture::ssl_test_check_handshaker_peers,
+               &SslTestFixture::ssl_test_destruct};
   }
 
   void TearDown() override {}
