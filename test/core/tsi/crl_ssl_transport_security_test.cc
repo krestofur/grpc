@@ -272,10 +272,8 @@ TEST_F(CrlSslTransportSecurityTest,
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture fixture = SslTestFixture(false, false);
-  tsi_test_fixture* tsi_test_fixture =
-      reinterpret_cast<struct tsi_test_fixture*>(&fixture.base);
   gpr_log(GPR_INFO, "DO HANDSHAKE");
-  tsi_test_do_handshake(tsi_test_fixture);
+  tsi_test_do_handshake(&fixture.base);
   tsi_test_fixture_destroy(tsi_test_fixture);
 }
 
