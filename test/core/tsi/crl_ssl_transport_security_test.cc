@@ -79,7 +79,7 @@ class SslTestFixture : public tsi_test_fixture {
     session_ticket_key_size = 0;
   }
 
- private:
+ public:
   static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
     SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
     GPR_ASSERT(ssl_fixture != nullptr);
