@@ -262,14 +262,14 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  // tsi_test_fixture_destroy(base);
 }
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
   SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  // tsi_test_fixture_destroy(base);
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -277,7 +277,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  // tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {
