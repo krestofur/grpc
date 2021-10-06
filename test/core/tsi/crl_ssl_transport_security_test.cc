@@ -269,6 +269,7 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
+  delete fixture;
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -277,6 +278,7 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
+  delete fixture;
 }
 
 int main(int argc, char** argv) {
