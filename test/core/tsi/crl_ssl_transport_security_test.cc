@@ -243,6 +243,11 @@ class SslTestFixture : public tsi_test_fixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
 
+static struct tsi_test_fixture_vtable kVtable = {
+    &SslTestFixture::ssl_test_setup_handshakers,
+    &SslTestFixture::ssl_test_check_handshaker_peers,
+    &SslTestFixture::ssl_test_destruct};
+
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   CrlSslTransportSecurityTest() {}
