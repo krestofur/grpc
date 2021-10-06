@@ -243,11 +243,6 @@ class SslTestFixture : public tsi_test_fixture {
   tsi_ssl_client_handshaker_factory* client_handshaker_factory;
 };
 
-static struct tsi_test_fixture_vtable kVtable = {
-    &SslTestFixture::ssl_test_setup_handshakers,
-    &SslTestFixture::ssl_test_check_handshaker_peers,
-    &SslTestFixture::ssl_test_destruct};
-
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
   CrlSslTransportSecurityTest() {}
@@ -261,14 +256,14 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, true);
 }
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
   SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, true);
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -276,7 +271,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, true);
 }
 
 int main(int argc, char** argv) {
