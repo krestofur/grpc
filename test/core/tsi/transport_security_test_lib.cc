@@ -634,7 +634,7 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture, bool use_delete) {
   fixture->vtable->destruct(fixture);
   gpr_mu_destroy(&fixture->mu);
   gpr_cv_destroy(&fixture->cv);
-  if (delete) {
+  if (use_delete) {
     delete fixture;
     return;
   }
