@@ -186,32 +186,32 @@ class SslTestFixture : public tsi_test_fixture {
   }
 
   static void ssl_test_destruct(tsi_test_fixture* fixture) {
-    // SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
-    // gpr_log(GPR_INFO, "DO ssl_test_destruct");
+    SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
+    gpr_log(GPR_INFO, "DO ssl_test_destruct");
 
-    // if (ssl_fixture == nullptr) {
-    //   return;
-    // }
+    if (ssl_fixture == nullptr) {
+      return;
+    }
 
-    // for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
-    //   ssl_test_pem_key_cert_pair_destroy(
-    //       ssl_fixture->valid_pem_key_cert_pairs[i]);
-    // }
-    // gpr_free(ssl_fixture->valid_pem_key_cert_pairs);
+    for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
+      ssl_test_pem_key_cert_pair_destroy(
+          ssl_fixture->valid_pem_key_cert_pairs[i]);
+    }
+    gpr_free(ssl_fixture->valid_pem_key_cert_pairs);
 
-    // for (size_t i = 0; i < ssl_fixture->revoked_num_key_cert_pairs; i++) {
-    //   ssl_test_pem_key_cert_pair_destroy(
-    //       ssl_fixture->revoked_pem_key_cert_pairs[i]);
-    // }
-    // gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
+    for (size_t i = 0; i < ssl_fixture->revoked_num_key_cert_pairs; i++) {
+      ssl_test_pem_key_cert_pair_destroy(
+          ssl_fixture->revoked_pem_key_cert_pairs[i]);
+    }
+    gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
 
-    // gpr_free(ssl_fixture->root_cert);
-    // tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
-    // /* Unreference others. */
-    // tsi_ssl_server_handshaker_factory_unref(
-    //     ssl_fixture->server_handshaker_factory);
-    // tsi_ssl_client_handshaker_factory_unref(
-    //     ssl_fixture->client_handshaker_factory);
+    gpr_free(ssl_fixture->root_cert);
+    tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
+    /* Unreference others. */
+    tsi_ssl_server_handshaker_factory_unref(
+        ssl_fixture->server_handshaker_factory);
+    tsi_ssl_client_handshaker_factory_unref(
+        ssl_fixture->client_handshaker_factory);
   }
 
   static char* load_file(const char* dir_path, const char* file_name) {
