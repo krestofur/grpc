@@ -616,7 +616,7 @@ void tsi_test_fixture_init(tsi_test_fixture* fixture) {
   fixture->notified = false;
 }
 
-void tsi_test_fixture_destroy(tsi_test_fixture* fixture, bool delete) {
+void tsi_test_fixture_destroy(tsi_test_fixture* fixture, bool use_delete) {
   if (fixture == nullptr) {
     gpr_log(GPR_INFO, "BAD!");
     return;
