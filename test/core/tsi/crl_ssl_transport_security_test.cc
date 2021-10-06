@@ -203,6 +203,7 @@ class SslTestFixture : public tsi_test_fixture {
       ssl_test_pem_key_cert_pair_destroy(
           ssl_fixture->revoked_pem_key_cert_pairs[i]);
     }
+
     gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
 
     gpr_free(ssl_fixture->root_cert);
@@ -269,7 +270,6 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
-  delete fixture;
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -278,7 +278,6 @@ TEST_F(CrlSslTransportSecurityTest,
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
-  delete fixture;
 }
 
 int main(int argc, char** argv) {
