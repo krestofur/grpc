@@ -252,10 +252,15 @@ static struct tsi_test_fixture_vtable kVtable = {
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
-  CrlSslTransportSecurityTest() {}
+  CrlSslTransportSecurityTest() {
+    fixture_ = new SslTestFixture(false, false, &kVtable);
+  }
   void SetUp() override {}
 
   void TearDown() override {}
+
+ private:
+  SslTestFixture* fixture_;
 };
 
 // TEST_F(CrlSslTransportSecurityTest,
@@ -277,7 +282,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
-  SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_do_handshake(&fixture->base);
   tsi_test_fixture_destroy(&fixture->base);
   delete fixture;
