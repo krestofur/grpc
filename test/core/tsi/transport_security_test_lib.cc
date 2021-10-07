@@ -642,6 +642,7 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   gpr_log(GPR_INFO, "CALLEDF DESTROY");
   tsi_handshaker_result_destroy(fixture->client_result);
   tsi_handshaker_result_destroy(fixture->server_result);
+  gpr_log(GPR_INFO, "HERE");
   tsi_test_channel_destroy(fixture->channel);
   GPR_ASSERT(fixture->vtable != nullptr);
   GPR_ASSERT(fixture->vtable->destruct != nullptr);
