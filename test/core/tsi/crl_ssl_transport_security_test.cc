@@ -279,10 +279,10 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
-  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  tsi_test_fixture* base = rei nterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
   tsi_test_fixture_destroy(base);
-  // delete fixture;
+  delete fixture;
 }
 
 int main(int argc, char** argv) {
