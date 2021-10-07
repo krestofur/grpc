@@ -228,7 +228,7 @@ class SslTestFixture {
     gpr_free(file_path);
     return data;
   }
-  tsi_test_fixture* base;
+  tsi_test_fixture base;
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
   char* root_cert;
