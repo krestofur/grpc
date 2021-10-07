@@ -44,11 +44,10 @@ const char* const kSslTsiTestCrlSupportedCredentialsDir =
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
-class SslTestFixture : public tsi_test_fixture {
+class SslTestFixture {
  public:
   SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert,
                  tsi_test_fixture_vtable* vtable) {
-    tsi_test_fixture* base = this;
     tsi_test_fixture_init(base);
     base->test_unused_bytes = true;
     base->vtable = vtable;
@@ -229,7 +228,7 @@ class SslTestFixture : public tsi_test_fixture {
     gpr_free(file_path);
     return data;
   }
-
+  tsi_test_fixture* base;
   bool use_revoked_server_cert_;
   bool use_revoked_client_cert_;
   char* root_cert;
@@ -279,9 +278,8 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
-  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-  tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_do_handshake(&fixture->base);
+  tsi_test_fixture_destroy(&fixture->base);
   delete fixture;
 }
 
