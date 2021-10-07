@@ -48,9 +48,9 @@ class SslTestFixture {
  public:
   SslTestFixture(bool use_revoked_server_cert, bool use_revoked_client_cert,
                  tsi_test_fixture_vtable* vtable) {
-    tsi_test_fixture_init(base);
-    base->test_unused_bytes = true;
-    base->vtable = vtable;
+    tsi_test_fixture_init(&base);
+    base.test_unused_bytes = true;
+    base.vtable = vtable;
     revoked_num_key_cert_pairs = kSslTsiTestRevokedKeyCertPairsNum;
     valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
     use_revoked_client_cert_ = use_revoked_client_cert;
