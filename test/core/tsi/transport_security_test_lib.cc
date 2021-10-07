@@ -390,23 +390,22 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
   handshaker_args* server_args =
       handshaker_args_create(fixture, false /* is_client */);
   /* Do handshake. */
-  // do {
-  //   client_args->transferred_data = false;
-  //   server_args->transferred_data = false;
-  //   do_handshaker_next(client_args);
-  //   if (client_args->error != GRPC_ERROR_NONE) {
-  //     break;
-  //   }
-  //   do_handshaker_next(server_args);
-  //   if (server_args->error != GRPC_ERROR_NONE) {
-  //     break;
-  //   }
-  //   GPR_ASSERT(client_args->transferred_data ||
-  //   server_args->transferred_data);
-  // } while (fixture->client_result == nullptr ||
-  //          fixture->server_result == nullptr);
-  // /* Verify handshake results. */
-  // check_handshake_results(fixture);
+  do {
+    client_args->transferred_data = false;
+    server_args->transferred_data = false;
+    do_handshaker_next(client_args);
+    if (client_args->error != GRPC_ERROR_NONE) {
+      break;
+    }
+    do_handshaker_next(server_args);
+    if (server_args->error != GRPC_ERROR_NONE) {
+      break;
+    }
+    GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
+  } while (fixture->client_result == nullptr ||
+           fixture->server_result == nullptr);
+  /* Verify handshake results. */
+  check_handshake_results(fixture);
   /* Cleanup. */
   handshaker_args_destroy(client_args);
   handshaker_args_destroy(server_args);
