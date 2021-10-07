@@ -132,11 +132,11 @@ class SslTestFixture {
     GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
                    ssl_fixture->client_handshaker_factory,
                    ssl_fixture->server_name_indication,
-                   &ssl_fixture->client_handshaker) == TSI_OK);
+                   &ssl_fixture->fixture->base.client_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE1");
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
-                   &ssl_fixture->server_handshaker) == TSI_OK);
+                   &ssl_fixture->fixture->base.server_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE2");
   }
 
@@ -166,18 +166,20 @@ class SslTestFixture {
 #endif
 
     if (expect_client_success) {
-      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->client_result,
-                                                    &peer) == TSI_OK);
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(
+                     ssl_fixture->fixture->base.client_result, &peer) ==
+                 TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->client_result == nullptr);
+      GPR_ASSERT(ssl_fixture->fixture->base.client_result == nullptr);
     }
     if (expect_server_success) {
-      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->server_result,
-                                                    &peer) == TSI_OK);
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(
+                     ssl_fixture->fixture->base.server_result, &peer) ==
+                 TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->server_result == nullptr);
+      GPR_ASSERT(ssl_fixture->fixture->base.server_result == nullptr);
     }
   }
 
