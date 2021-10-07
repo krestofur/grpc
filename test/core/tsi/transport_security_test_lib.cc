@@ -401,12 +401,13 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     if (server_args->error != GRPC_ERROR_NONE) {
       break;
     }
-    gpr_log(GPR_INFO, "Client transferred data " + client_args->transferred_data
-                          ? "True"
-                          : "False");
-    gpr_log(GPR_INFO, "Server transferred data " + server_args->transferred_data
-                          ? "True"
-                          : "False");
+    std::string clientLog = "Client transferred data ";
+    clientLog += client_args->transferred_data ? "True" : "False";
+    std::string serverLog = "Server transferred data ";
+    serverLog += server_args->transferred_data ? "True" : "False";
+
+    gpr_log(GPR_INFO, clientLog);
+    gpr_log(GPR_INFO, serverLog);
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
