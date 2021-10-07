@@ -128,10 +128,10 @@ static tsi_result handshaker_result_create_zero_copy_grpc_protector(
 }
 
 static void handshaker_result_destroy(tsi_handshaker_result* self) {
+  gpr_log(GPR_INFO, "FREE RESULT MEMORY");
   if (self == nullptr) {
     return;
   }
-  gpr_log(GPR_INFO, "FREE RESULT MEMORY");
   local_tsi_handshaker_result* result =
       reinterpret_cast<local_tsi_handshaker_result*>(
           const_cast<tsi_handshaker_result*>(self));
