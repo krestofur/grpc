@@ -351,7 +351,7 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
 
   std::stringstream ss;
   ss << "ClientResultAddress: " << fixture->client_result;
-  ss << ". ServerResultAddress: " << fixture->client_result;
+  ss << ". ServerResultAddress: " << fixture->server_result;
   gpr_log(GPR_INFO, ss.str().c_str());
 
   return (args->is_client && fixture->client_result != nullptr) ||
