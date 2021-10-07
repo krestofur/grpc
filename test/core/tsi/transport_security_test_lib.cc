@@ -340,6 +340,13 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args != nullptr);
   GPR_ASSERT(args->fixture != nullptr);
   tsi_test_fixture* fixture = args->fixture;
+  std::string logClientResult = "ClientResult: ";
+  logClientResult += fixture->client_result == nullptr ? "NULL" : "NON-NULL";
+  std::string logServerResult = "ServerResult: ";
+  logServerResult += fixture->server_result == nullptr ? "NULL" : "NON-NULL";
+  gpr_log(GPR_INFO, logClientResult);
+  gpr_log(GPR_INFO, logServerResult);
+
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
 }
@@ -363,7 +370,6 @@ static void do_handshaker_next(handshaker_args* args) {
   /* Receive data from peer, if available. */
   do {
     size_t buf_size = args->handshake_buffer_size;
-
     receive_bytes_from_peer(fixture->channel, &args->handshake_buffer,
                             &buf_size, args->is_client);
     if (buf_size > 0) {
@@ -404,13 +410,6 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     if (server_args->error != GRPC_ERROR_NONE) {
       break;
     }
-    std::string clientLog = "Client transferred data ";
-    clientLog += client_args->transferred_data ? "True" : "False";
-    std::string serverLog = "Server transferred data ";
-    serverLog += server_args->transferred_data ? "True" : "False";
-
-    gpr_log(GPR_INFO, clientLog.c_str());
-    gpr_log(GPR_INFO, serverLog.c_str());
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
@@ -626,13 +625,10 @@ void tsi_test_fixture_init(tsi_test_fixture* fixture) {
   fixture->notified = false;
 }
 
-void tsi_test_fixture_destroy(tsi_test_fixture* fixture, bool use_delete) {
+void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   if (fixture == nullptr) {
-    gpr_log(GPR_INFO, "BAD!");
     return;
   }
-  gpr_log(GPR_INFO, "DO tsi_test_fixture_destroy");
-
   tsi_test_frame_protector_config_destroy(fixture->config);
   tsi_handshaker_destroy(fixture->client_handshaker);
   tsi_handshaker_destroy(fixture->server_handshaker);
@@ -644,7 +640,7 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture, bool use_delete) {
   fixture->vtable->destruct(fixture);
   gpr_mu_destroy(&fixture->mu);
   gpr_cv_destroy(&fixture->cv);
-  // gpr_free(fixture);
+  gpr_free(fixture);
 }
 
 tsi_test_frame_protector_fixture* tsi_test_frame_protector_fixture_create() {
