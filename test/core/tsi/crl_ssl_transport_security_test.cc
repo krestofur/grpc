@@ -132,11 +132,11 @@ class SslTestFixture {
     GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
                    ssl_fixture->client_handshaker_factory,
                    ssl_fixture->server_name_indication,
-                   &ssl_fixture->fixture->base.client_handshaker) == TSI_OK);
+                   &ssl_fixture->base.client_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE1");
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
-                   &ssl_fixture->fixture->base.server_handshaker) == TSI_OK);
+                   &ssl_fixture->base.server_handshaker) == TSI_OK);
     gpr_log(GPR_INFO, "HERE2");
   }
 
