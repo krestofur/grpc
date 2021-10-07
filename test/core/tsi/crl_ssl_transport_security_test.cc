@@ -252,39 +252,36 @@ static struct tsi_test_fixture_vtable kVtable = {
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  protected:
-  CrlSslTransportSecurityTest() {
-    fixture_ = new SslTestFixture(false, false, &kVtable);
-  }
+  CrlSslTransportSecurityTest() {}
   void SetUp() override {}
 
   void TearDown() override {}
-  SslTestFixture* fixture_;
 
  private:
 };
 
-// TEST_F(CrlSslTransportSecurityTest,
-//        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
-//   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
-//   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-//   tsi_test_do_handshake(base);
-//   tsi_test_fixture_destroy(base);
-//   delete fixture;
-// }
-// TEST_F(CrlSslTransportSecurityTest,
-//        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
-//   SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
-//   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
-//   tsi_test_do_handshake(base);
-//   tsi_test_fixture_destroy(base);
-//   delete fixture;
-// }
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_server_cert) {
+  SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  tsi_test_do_handshake(base);
+  tsi_test_fixture_destroy(base);
+  delete fixture;
+}
+TEST_F(CrlSslTransportSecurityTest,
+       ssl_tsi_test_do_handshake_with_revoked_client_cert) {
+  SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  tsi_test_do_handshake(base);
+  tsi_test_fixture_destroy(base);
+}
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
-  tsi_test_do_handshake(&fixture_->base);
-  tsi_test_fixture_destroy(&fixture_->base);
-  delete fixture_;
+  SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
+  tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
+  tsi_test_do_handshake(base);
+  tsi_test_fixture_destroy(base);
 }
 
 int main(int argc, char** argv) {

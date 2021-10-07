@@ -639,7 +639,6 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   tsi_test_frame_protector_config_destroy(fixture->config);
   tsi_handshaker_destroy(fixture->client_handshaker);
   tsi_handshaker_destroy(fixture->server_handshaker);
-  gpr_log(GPR_INFO, "CALLEDF DESTROY");
   tsi_handshaker_result_destroy(fixture->client_result);
   tsi_handshaker_result_destroy(fixture->server_result);
   tsi_test_channel_destroy(fixture->channel);
@@ -648,7 +647,6 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   fixture->vtable->destruct(fixture);
   gpr_mu_destroy(&fixture->mu);
   gpr_cv_destroy(&fixture->cv);
-  // gpr_free(fixture);
 }
 
 tsi_test_frame_protector_fixture* tsi_test_frame_protector_fixture_create() {
