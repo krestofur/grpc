@@ -167,19 +167,17 @@ class SslTestFixture {
 
     if (expect_client_success) {
       GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                     ssl_fixture->fixture->base.client_result, &peer) ==
-                 TSI_OK);
+                     ssl_fixture->base.client_result, &peer) == TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->fixture->base.client_result == nullptr);
+      GPR_ASSERT(ssl_fixture->base.client_result == nullptr);
     }
     if (expect_server_success) {
       GPR_ASSERT(tsi_handshaker_result_extract_peer(
-                     ssl_fixture->fixture->base.server_result, &peer) ==
-                 TSI_OK);
+                     ssl_fixture->base.server_result, &peer) == TSI_OK);
       tsi_peer_destruct(&peer);
     } else {
-      GPR_ASSERT(ssl_fixture->fixture->base.server_result == nullptr);
+      GPR_ASSERT(ssl_fixture->base.server_result == nullptr);
     }
   }
 
