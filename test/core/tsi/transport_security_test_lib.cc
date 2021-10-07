@@ -16,8 +16,6 @@
  *
  */
 
-#include "test/core/tsi/transport_security_test_lib.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +26,7 @@
 #include <grpc/support/log.h>
 
 #include "src/core/lib/security/transport/tsi_error.h"
+#include "test/core/tsi/transport_security_test_lib.h"
 
 static void notification_signal(tsi_test_fixture* fixture) {
   gpr_mu_lock(&fixture->mu);
@@ -341,18 +340,6 @@ static void on_handshake_next_done_wrapper(
 static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args != nullptr);
   GPR_ASSERT(args->fixture != nullptr);
-  tsi_test_fixture* fixture = args->fixture;
-  std::string logClientResult = "ClientResult: ";
-  logClientResult += fixture->client_result == nullptr ? "NULL" : "NON-NULL";
-  std::string logServerResult = "ServerResult: ";
-  logServerResult += fixture->server_result == nullptr ? "NULL" : "NON-NULL";
-  gpr_log(GPR_INFO, logClientResult.c_str());
-  gpr_log(GPR_INFO, logServerResult.c_str());
-
-  std::stringstream ss;
-  ss << "ClientResultAddress: " << fixture->client_result;
-  ss << ". ServerResultAddress: " << fixture->server_result;
-  gpr_log(GPR_INFO, ss.str().c_str());
 
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
@@ -365,11 +352,9 @@ static void do_handshaker_next(handshaker_args* args) {
   tsi_test_fixture* fixture = args->fixture;
   tsi_handshaker* handshaker =
       args->is_client ? fixture->client_handshaker : fixture->server_handshaker;
-  gpr_log(GPR_INFO, "HERE!!");
   if (is_handshake_finished_properly(args)) {
     return;
   }
-  gpr_log(GPR_INFO, "FINISHED PROPERLY");
   tsi_handshaker_result* handshaker_result = nullptr;
   unsigned char* bytes_to_send = nullptr;
   size_t bytes_to_send_size = 0;
