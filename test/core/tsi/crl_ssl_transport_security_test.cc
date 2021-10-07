@@ -265,7 +265,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(true, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, false);
   delete fixture;
 }
 TEST_F(CrlSslTransportSecurityTest,
@@ -273,7 +273,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(false, true, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, false);
 }
 
 TEST_F(CrlSslTransportSecurityTest,
@@ -281,7 +281,7 @@ TEST_F(CrlSslTransportSecurityTest,
   SslTestFixture* fixture = new SslTestFixture(false, false, &kVtable);
   tsi_test_fixture* base = reinterpret_cast<tsi_test_fixture*>(fixture);
   tsi_test_do_handshake(base);
-  tsi_test_fixture_destroy(base);
+  tsi_test_fixture_destroy(base, false);
 }
 
 int main(int argc, char** argv) {
