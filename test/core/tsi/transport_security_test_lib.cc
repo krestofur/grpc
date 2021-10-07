@@ -339,6 +339,7 @@ static void on_handshake_next_done_wrapper(
 static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args != nullptr);
   GPR_ASSERT(args->fixture != nullptr);
+  tsi_test_fixture* fixture = args->fixture;
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
 }
