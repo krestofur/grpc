@@ -79,6 +79,8 @@ class SslTestFixture : public tsi_test_fixture {
     // session_ticket_key_size = 0;
   }
 
+  ~SslTestFixture() { gpr_log(GPR_INFO, "Called destructor"); }
+
  public:
   static void ssl_test_setup_handshakers(tsi_test_fixture* fixture) {
     SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
@@ -140,50 +142,44 @@ class SslTestFixture : public tsi_test_fixture {
   }
 
   static void ssl_test_check_handshaker_peers(tsi_test_fixture* fixture) {
-    //     SslTestFixture* ssl_fixture =
-    //     reinterpret_cast<SslTestFixture*>(fixture); GPR_ASSERT(ssl_fixture !=
-    //     nullptr); tsi_peer peer; gpr_log(GPR_INFO, "CHECJ HANDHSKAPER PEER");
+    SslTestFixture* ssl_fixture = reinterpret_cast<SslTestFixture*>(fixture);
+    GPR_ASSERT(ssl_fixture != nullptr);
+    tsi_peer peer;
+    gpr_log(GPR_INFO, "CHECJ HANDHSKAPER PEER");
 
-    //     // In TLS 1.3, the client-side handshake succeeds even if the client
-    //     sends a
-    //     // revoked certificate. In such a case, the server would fail the TLS
-    //     // handshake and send an alert to the client as the first application
-    //     data
-    //     // message. In TLS 1.2, the client-side handshake will fail if the
-    //     client
-    //     // sends a revoked certificate.
-    //     //
-    //     // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the
-    //     client-side
-    //     // handshake should succeed precisely when the server-side handshake
-    //     // succeeds.
-    //     bool expect_server_success = !(ssl_fixture->use_revoked_server_cert_
-    //     ||
-    //                                    ssl_fixture->use_revoked_client_cert_);
-    // #if OPENSSL_VERSION_NUMBER >= 0x10100000
-    //     bool expect_client_success = test_tls_version ==
-    //     tsi_tls_version::TSI_TLS1_2
-    //                                      ? expect_server_success
-    //                                      :
-    //                                      !(ssl_fixture->use_revoked_server_cert_);
-    // #else
-    //     bool expect_client_success = expect_server_success;
-    // #endif
+    // In TLS 1.3, the client-side handshake succeeds even if the client sends a
+    // revoked certificate. In such a case, the server would fail the TLS
+    // handshake and send an alert to the client as the first application data
+    // message. In TLS 1.2, the client-side handshake will fail if the client
+    // sends a revoked certificate.
+    //
+    // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the client-side
+    // handshake should succeed precisely when the server-side handshake
+    // succeeds.
+    bool expect_server_success = !(ssl_fixture->use_revoked_server_cert_ ||
+                                   ssl_fixture->use_revoked_client_cert_);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000
+    bool expect_client_success = test_tls_version == tsi_tls_version::TSI_TLS1_2
+                                     ? expect_server_success
+                                     : !(ssl_fixture->use_revoked_server_cert_);
+#else
+    bool expect_client_success = expect_server_success;
+#endif
 
-    //     if (expect_client_success) {
-    //       GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->client_result,
-    //                                                     &peer) == TSI_OK);
-    //       tsi_peer_destruct(&peer);
-    //     } else {
-    //       GPR_ASSERT(ssl_fixture->client_result == nullptr);
-    //     }
-    //     if (expect_server_success) {
-    //       GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->server_result,
-    //                                                     &peer) == TSI_OK);
-    //       tsi_peer_destruct(&peer);
-    //     } else {
-    //       GPR_ASSERT(ssl_fixture->server_result == nullptr);
-    //     }
+    if (expect_client_success) {
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->client_result,
+                                                    &peer) == TSI_OK);
+      tsi_peer_destruct(&peer);
+    } else {
+      GPR_ASSERT(ssl_fixture->client_result == nullptr);
+    }
+    if (expect_server_success) {
+      GPR_ASSERT(tsi_handshaker_result_extract_peer(ssl_fixture->server_result,
+                                                    &peer) == TSI_OK);
+      tsi_peer_destruct(&peer);
+    } else {
+      GPR_ASSERT(ssl_fixture->server_result == nullptr);
+    }
   }
 
   static void ssl_test_pem_key_cert_pair_destroy(tsi_ssl_pem_key_cert_pair kp) {
