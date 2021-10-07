@@ -183,8 +183,7 @@ void tsi_test_fixture_init(tsi_test_fixture* fixture);
    fixture intance must be dynamically allocated and will be freed by
    this function. If use_delete is true, the fixture ptr will be deleted instead
    of free'd (Useful for calling destructors of derived classes.*/
-void tsi_test_fixture_destroy(tsi_test_fixture* fixture,
-                              bool use_delete = false);
+void tsi_test_fixture_destroy(tsi_test_fixture* fixture);
 
 /* This method creates a tsi_test_frame_protector_fixture instance. */
 tsi_test_frame_protector_fixture* tsi_test_frame_protector_fixture_create();
