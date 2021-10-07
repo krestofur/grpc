@@ -351,6 +351,7 @@ static void do_handshaker_next(handshaker_args* args) {
   tsi_test_fixture* fixture = args->fixture;
   tsi_handshaker* handshaker =
       args->is_client ? fixture->client_handshaker : fixture->server_handshaker;
+  gpr_log(GPR_INFO, "HERE!!");
   if (is_handshake_finished_properly(args)) {
     return;
   }
