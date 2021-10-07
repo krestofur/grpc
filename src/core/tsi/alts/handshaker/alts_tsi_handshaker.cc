@@ -231,6 +231,7 @@ static tsi_result handshaker_result_get_unused_bytes(
 }
 
 static void handshaker_result_destroy(tsi_handshaker_result* self) {
+  gpr_log(GPR_INFO, "FREE RESULT MEMORY FIRST");
   if (self == nullptr) {
     return;
   }
