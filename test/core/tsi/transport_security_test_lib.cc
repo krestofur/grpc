@@ -344,8 +344,8 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   logClientResult += fixture->client_result == nullptr ? "NULL" : "NON-NULL";
   std::string logServerResult = "ServerResult: ";
   logServerResult += fixture->server_result == nullptr ? "NULL" : "NON-NULL";
-  gpr_log(GPR_INFO, logClientResult);
-  gpr_log(GPR_INFO, logServerResult);
+  gpr_log(GPR_INFO, logClientResult.c_str());
+  gpr_log(GPR_INFO, logServerResult.c_str());
 
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
