@@ -355,6 +355,7 @@ static void do_handshaker_next(handshaker_args* args) {
   if (is_handshake_finished_properly(args)) {
     return;
   }
+  gpr_log(GPR_INFO, "FINISHED PROPERLY");
   tsi_handshaker_result* handshaker_result = nullptr;
   unsigned char* bytes_to_send = nullptr;
   size_t bytes_to_send_size = 0;
