@@ -363,9 +363,6 @@ static void do_handshaker_next(handshaker_args* args) {
   /* Receive data from peer, if available. */
   do {
     size_t buf_size = args->handshake_buffer_size;
-    std::string test = "buf size: ";
-    test += buf_size;
-    gpr_log(GPR_INFO, test.c_str());
 
     receive_bytes_from_peer(fixture->channel, &args->handshake_buffer,
                             &buf_size, args->is_client);
