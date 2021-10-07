@@ -401,6 +401,10 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     if (server_args->error != GRPC_ERROR_NONE) {
       break;
     }
+    gpr_log(GPR_INFO,
+            "Client transferred data " + client_args->transferred_data);
+    gpr_log(GPR_INFO,
+            "Server transferred data " + server_args->transferred_data);
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
