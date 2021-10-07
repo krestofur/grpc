@@ -234,7 +234,6 @@ static void handshaker_result_destroy(tsi_handshaker_result* self) {
   if (self == nullptr) {
     return;
   }
-
   alts_tsi_handshaker_result* result =
       reinterpret_cast<alts_tsi_handshaker_result*>(
           const_cast<tsi_handshaker_result*>(self));

@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sstream>  //for std::stringstream
 
 #include <grpc/grpc.h>
 #include <grpc/support/alloc.h>
@@ -340,7 +339,6 @@ static void on_handshake_next_done_wrapper(
 static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args != nullptr);
   GPR_ASSERT(args->fixture != nullptr);
-
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
 }
@@ -632,6 +630,7 @@ void tsi_test_fixture_destroy(tsi_test_fixture* fixture) {
   fixture->vtable->destruct(fixture);
   gpr_mu_destroy(&fixture->mu);
   gpr_cv_destroy(&fixture->cv);
+  gpr_free(fixture);
 }
 
 tsi_test_frame_protector_fixture* tsi_test_frame_protector_fixture_create() {
