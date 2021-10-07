@@ -406,8 +406,8 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     std::string serverLog = "Server transferred data ";
     serverLog += server_args->transferred_data ? "True" : "False";
 
-    gpr_log(GPR_INFO, clientLog);
-    gpr_log(GPR_INFO, serverLog);
+    gpr_log(GPR_INFO, clientLog.c_str());
+    gpr_log(GPR_INFO, serverLog.c_str());
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
