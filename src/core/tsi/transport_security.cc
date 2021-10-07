@@ -274,7 +274,11 @@ tsi_result tsi_handshaker_result_get_unused_bytes(
 }
 
 void tsi_handshaker_result_destroy(tsi_handshaker_result* self) {
+  gpr_log(GPR_INFO, "in destroy");
+
   if (self == nullptr) return;
+  gpr_log(GPR_INFO, "in destroy: destroying result");
+
   self->vtable->destroy(self);
 }
 
