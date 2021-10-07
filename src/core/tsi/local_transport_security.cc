@@ -131,6 +131,7 @@ static void handshaker_result_destroy(tsi_handshaker_result* self) {
   if (self == nullptr) {
     return;
   }
+  gpr_log(GPR_INFO, "FREE RESULT MEMORY");
   local_tsi_handshaker_result* result =
       reinterpret_cast<local_tsi_handshaker_result*>(
           const_cast<tsi_handshaker_result*>(self));
