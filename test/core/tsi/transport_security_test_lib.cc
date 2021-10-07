@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>  //for std::stringstream
 
 #include <grpc/grpc.h>
 #include <grpc/support/alloc.h>
