@@ -262,7 +262,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   }
 
   static char* load_file(absl::string_view file_path) {
-    std::string file_path = absl::StrAppend(dir_path, file_name);
     grpc_slice slice;
     GPR_ASSERT(grpc_load_file(file_path.c_str(), 1, &slice) == GRPC_ERROR_NONE);
     char* data = grpc_slice_to_c_string(slice);
