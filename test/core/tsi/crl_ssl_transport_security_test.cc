@@ -270,7 +270,7 @@ int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   grpc::testing::TestEnvironment env(argc, argv);
   grpc_init();
-  INSTANTIATE_TEST_SUITE_P(MeenyMinyMoe, FooTest,
+  INSTANTIATE_TEST_SUITE_P(TLSVersionsTest, CrlSslTransportSecurityTest,
                            testing::Values(tsi_tls_version::TSI_TLS1_2,
                                            tsi_tls_version::TSI_TLS1_3));
 
