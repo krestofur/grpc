@@ -102,15 +102,15 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
             gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                        key_cert_lib->valid_num_key_cert_pairs));
     key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.key");
+        load_file(kSslTsiTestCrlSupportedCredentialsDir + "revoked.key");
     key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "revoked.pem");
+        load_file(kSslTsiTestCrlSupportedCredentialsDir + "revoked.pem");
     key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.key");
+        load_file(kSslTsiTestCrlSupportedCredentialsDir + "valid.key");
     key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "valid.pem");
+        load_file(kSslTsiTestCrlSupportedCredentialsDir + "valid.pem");
     key_cert_lib->root_cert =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem");
+        load_file(kSslTsiTestCrlSupportedCredentialsDir + "ca.pem");
     key_cert_lib->root_store =
         tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
     key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
@@ -177,7 +177,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     /* Create server and client handshakers. */
     GPR_ASSERT(tsi_ssl_client_handshaker_factory_create_handshaker(
                    ssl_fixture->client_handshaker_factory,
-                   ssl_fixture->server_name_indication,
+                   ssl_fixture->server_name_indication.c_str(),
                    &ssl_fixture->base.client_handshaker) == TSI_OK);
     GPR_ASSERT(tsi_ssl_server_handshaker_factory_create_handshaker(
                    ssl_fixture->server_handshaker_factory,
@@ -261,8 +261,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         ssl_fixture->client_handshaker_factory);
   }
 
-  static char* load_file(absl::string_view dir_path,
-                         absl::string_view file_name) {
+  static char* load_file(absl::string_view file_path) {
     std::string file_path = absl::StrAppend(dir_path, file_name);
     grpc_slice slice;
     GPR_ASSERT(grpc_load_file(file_path.c_str(), 1, &slice) == GRPC_ERROR_NONE);
