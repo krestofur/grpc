@@ -38,7 +38,7 @@ extern "C" {
 
 static const int kSslTsiTestRevokedKeyCertPairsNum = 1;
 static const int kSslTsiTestValidKeyCertPairsNum = 1;
-static constexpr std::string kSslTsiTestCrlSupportedCredentialsDir =
+static const std::string kSslTsiTestCrlSupportedCredentialsDir =
     "test/core/tsi/test_creds/";
 
 // Indicates the TLS version used for the test.
