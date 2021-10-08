@@ -59,7 +59,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs;
     uint16_t revoked_num_key_cert_pairs;
     uint16_t valid_num_key_cert_pairs;
-    const std::string crl_directory;
+    std::string crl_directory;
   };
 
   struct SslTsiTestFixture {
