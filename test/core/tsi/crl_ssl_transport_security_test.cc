@@ -46,11 +46,8 @@ static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
 class CrlSslTransportSecurityTest : public ::testing::Test {
  public:
-  // Credentials created under the root
-  // kSslTsiTestCrlSupportedCredentialsDir/ca.pem
-  // The CA root is also configured with KeyUsage cRLSign that the CA root in
-  // tsi_test_creds does not contain
-  struct SslKeyCertLib {
+  struct SslTsiTestFixture {
+    tsi_test_fixture base;
     bool use_revoked_server_cert;
     bool use_revoked_client_cert;
     char* root_cert;
@@ -60,11 +57,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     uint16_t revoked_num_key_cert_pairs;
     uint16_t valid_num_key_cert_pairs;
     std::string crl_directory;
-  };
-
-  struct SslTsiTestFixture {
-    tsi_test_fixture base;
-    SslKeyCertLib* key_cert_lib;
     std::string server_name_indication;
     bool session_reused;
     std::string session_ticket_key;
@@ -87,35 +79,31 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     tsi_test_fixture_init(&ssl_fixture_->base);
     ssl_fixture_->base.test_unused_bytes = true;
     ssl_fixture_->base.vtable = &vtable_;
-    /* Create SslKeyCertLib-> */
-    SslKeyCertLib* key_cert_lib =
-        static_cast<SslKeyCertLib*>(gpr_zalloc(sizeof(*key_cert_lib)));
-    key_cert_lib->revoked_num_key_cert_pairs =
+    ssl_fixture_->revoked_num_key_cert_pairs =
         kSslTsiTestRevokedKeyCertPairsNum;
-    key_cert_lib->valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
-    key_cert_lib->revoked_pem_key_cert_pairs =
+    ssl_fixture_->valid_num_key_cert_pairs = kSslTsiTestValidKeyCertPairsNum;
+    ssl_fixture_->revoked_pem_key_cert_pairs =
         static_cast<tsi_ssl_pem_key_cert_pair*>(
             gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                       key_cert_lib->revoked_num_key_cert_pairs));
-    key_cert_lib->valid_pem_key_cert_pairs =
+                       ssl_fixture_->revoked_num_key_cert_pairs));
+    ssl_fixture_->valid_pem_key_cert_pairs =
         static_cast<tsi_ssl_pem_key_cert_pair*>(
             gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
-                       key_cert_lib->valid_num_key_cert_pairs));
-    key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
+                       ssl_fixture_->valid_num_key_cert_pairs));
+    ssl_fixture_->revoked_pem_key_cert_pairs[0].private_key =
         LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "revoked.key");
-    key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
+    ssl_fixture_->revoked_pem_key_cert_pairs[0].cert_chain =
         LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "revoked.pem");
-    key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
+    ssl_fixture_->valid_pem_key_cert_pairs[0].private_key =
         LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "valid.key");
-    key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
+    ssl_fixture_->valid_pem_key_cert_pairs[0].cert_chain =
         LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "valid.pem");
-    key_cert_lib->root_cert =
+    ssl_fixture_->root_cert =
         LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "ca.pem");
-    key_cert_lib->root_store =
-        tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
-    key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
-    GPR_ASSERT(key_cert_lib->root_store != nullptr);
-    ssl_fixture_->key_cert_lib = key_cert_lib;
+    ssl_fixture_->root_store =
+        tsi_ssl_root_certs_store_create(ssl_fixture_->root_cert);
+    ssl_fixture_->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
+    GPR_ASSERT(ssl_fixture_->root_store != nullptr);
   }
 
   void TearDown() override { tsi_test_fixture_destroy(&ssl_fixture_->base); }
@@ -128,21 +116,19 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     SslTsiTestFixture* ssl_fixture =
         reinterpret_cast<SslTsiTestFixture*>(fixture);
     GPR_ASSERT(ssl_fixture != nullptr);
-    GPR_ASSERT(ssl_fixture->key_cert_lib != nullptr);
-    SslKeyCertLib* key_cert_lib = ssl_fixture->key_cert_lib;
     /* Create client handshaker factory. */
 
     tsi_ssl_client_handshaker_options client_options;
-    client_options.pem_root_certs = key_cert_lib->root_cert;
-    if (key_cert_lib->use_revoked_client_cert) {
+    client_options.pem_root_certs = ssl_fixture->root_cert;
+    if (ssl_fixture->use_revoked_client_cert) {
       client_options.pem_key_cert_pair =
-          key_cert_lib->revoked_pem_key_cert_pairs;
+          ssl_fixture->revoked_pem_key_cert_pairs;
     } else {
-      client_options.pem_key_cert_pair = key_cert_lib->valid_pem_key_cert_pairs;
+      client_options.pem_key_cert_pair = ssl_fixture->valid_pem_key_cert_pairs;
     }
-    client_options.crl_directory = key_cert_lib->crl_directory.c_str();
+    client_options.crl_directory = ssl_fixture->crl_directory.c_str();
 
-    client_options.root_store = key_cert_lib->root_store;
+    client_options.root_store = ssl_fixture->root_store;
     client_options.min_tls_version = test_tls_version;
     client_options.max_tls_version = test_tls_version;
     GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
@@ -151,19 +137,17 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     /* Create server handshaker factory. */
     tsi_ssl_server_handshaker_options server_options;
 
-    if (key_cert_lib->use_revoked_server_cert) {
+    if (ssl_fixture->use_revoked_server_cert) {
       server_options.pem_key_cert_pairs =
-          key_cert_lib->revoked_pem_key_cert_pairs;
+          ssl_fixture->revoked_pem_key_cert_pairs;
       server_options.num_key_cert_pairs =
-          key_cert_lib->revoked_num_key_cert_pairs;
+          ssl_fixture->revoked_num_key_cert_pairs;
     } else {
-      server_options.pem_key_cert_pairs =
-          key_cert_lib->valid_pem_key_cert_pairs;
-      server_options.num_key_cert_pairs =
-          key_cert_lib->valid_num_key_cert_pairs;
+      server_options.pem_key_cert_pairs = ssl_fixture->valid_pem_key_cert_pairs;
+      server_options.num_key_cert_pairs = ssl_fixture->valid_num_key_cert_pairs;
     }
-    server_options.pem_client_root_certs = key_cert_lib->root_cert;
-    server_options.crl_directory = key_cert_lib->crl_directory.c_str();
+    server_options.pem_client_root_certs = ssl_fixture->root_cert;
+    server_options.crl_directory = ssl_fixture->crl_directory.c_str();
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
     server_options.session_ticket_key = ssl_fixture->session_ticket_key.c_str();
@@ -188,8 +172,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     SslTsiTestFixture* ssl_fixture =
         reinterpret_cast<SslTsiTestFixture*>(fixture);
     GPR_ASSERT(ssl_fixture != nullptr);
-    GPR_ASSERT(ssl_fixture->key_cert_lib != nullptr);
-    SslKeyCertLib* key_cert_lib = ssl_fixture->key_cert_lib;
     tsi_peer peer;
     // In TLS 1.3, the client-side handshake succeeds even if the client sends a
     // revoked certificate. In such a case, the server would fail the TLS
@@ -200,12 +182,12 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the client-side
     // handshake should succeed precisely when the server-side handshake
     // succeeds.
-    bool expect_server_success = !(key_cert_lib->use_revoked_server_cert ||
-                                   key_cert_lib->use_revoked_client_cert);
+    bool expect_server_success = !(ssl_fixture->use_revoked_server_cert ||
+                                   ssl_fixture->use_revoked_client_cert);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
     bool expect_client_success = test_tls_version == tsi_tls_version::TSI_TLS1_2
                                      ? expect_server_success
-                                     : !(key_cert_lib->use_revoked_server_cert);
+                                     : !(ssl_fixture->use_revoked_server_cert);
 #else
     bool expect_client_success = expect_server_success;
 #endif
@@ -238,22 +220,21 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
       return;
     }
     /* Destroy SslKeyCertLib-> */
-    SslKeyCertLib* key_cert_lib = ssl_fixture->key_cert_lib;
-    for (size_t i = 0; i < key_cert_lib->valid_num_key_cert_pairs; i++) {
+    for (size_t i = 0; i < ssl_fixture->valid_num_key_cert_pairs; i++) {
       ssl_test_pem_key_cert_pair_destroy(
-          key_cert_lib->valid_pem_key_cert_pairs[i]);
+          ssl_fixture->valid_pem_key_cert_pairs[i]);
     }
-    gpr_free(key_cert_lib->valid_pem_key_cert_pairs);
+    gpr_free(ssl_fixture->valid_pem_key_cert_pairs);
 
-    for (size_t i = 0; i < key_cert_lib->revoked_num_key_cert_pairs; i++) {
+    for (size_t i = 0; i < ssl_fixture->revoked_num_key_cert_pairs; i++) {
       ssl_test_pem_key_cert_pair_destroy(
-          key_cert_lib->revoked_pem_key_cert_pairs[i]);
+          ssl_fixture->revoked_pem_key_cert_pairs[i]);
     }
-    gpr_free(key_cert_lib->revoked_pem_key_cert_pairs);
+    gpr_free(ssl_fixture->revoked_pem_key_cert_pairs);
 
-    gpr_free(key_cert_lib->root_cert);
-    tsi_ssl_root_certs_store_destroy(key_cert_lib->root_store);
-    gpr_free(key_cert_lib);
+    gpr_free(ssl_fixture->root_cert);
+    tsi_ssl_root_certs_store_destroy(ssl_fixture->root_store);
+    gpr_free(ssl_fixture);
     /* Unreference others. */
     tsi_ssl_server_handshaker_factory_unref(
         ssl_fixture->server_handshaker_factory);
@@ -272,12 +253,12 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
-  ssl_fixture_->key_cert_lib->use_revoked_server_cert = true;
+  ssl_fixture_->use_revoked_server_cert = true;
   tsi_test_do_handshake(&ssl_fixture_->base);
 }
 TEST_F(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
-  ssl_fixture_->key_cert_lib->use_revoked_client_cert = true;
+  ssl_fixture_->use_revoked_client_cert = true;
   tsi_test_do_handshake(&ssl_fixture_->base);
 }
 
