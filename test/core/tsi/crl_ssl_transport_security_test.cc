@@ -140,7 +140,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     } else {
       client_options.pem_key_cert_pair = key_cert_lib->valid_pem_key_cert_pairs;
     }
-    client_options.crl_directory = key_cert_lib->crl_directory;
+    client_options.crl_directory = key_cert_lib->crl_directory.c_str();
 
     client_options.root_store = key_cert_lib->root_store;
     client_options.min_tls_version = test_tls_version;
@@ -163,7 +163,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
           key_cert_lib->valid_num_key_cert_pairs;
     }
     server_options.pem_client_root_certs = key_cert_lib->root_cert;
-    server_options.crl_directory = key_cert_lib->crl_directory;
+    server_options.crl_directory = key_cert_lib->crl_directory.c_str();
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
     server_options.session_ticket_key = ssl_fixture->session_ticket_key;
@@ -263,7 +263,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
 
   static char* load_file(absl::string_view dir_path,
                          absl::string_view file_name) {
-    std::string file_path = dir_path + file_name;
+    std::string file_path = absl::StrAppend(dir_path, file_name);
     grpc_slice slice;
     GPR_ASSERT(grpc_load_file(file_path.c_str(), 1, &slice) == GRPC_ERROR_NONE);
     char* data = grpc_slice_to_c_string(slice);
