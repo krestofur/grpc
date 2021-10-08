@@ -67,7 +67,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     SslKeyCertLib* key_cert_lib;
     std::string server_name_indication;
     bool session_reused;
-    const std::string session_ticket_key;
+    std::string session_ticket_key;
     size_t session_ticket_key_size;
     tsi_ssl_server_handshaker_factory* server_handshaker_factory;
     tsi_ssl_client_handshaker_factory* client_handshaker_factory;
@@ -166,7 +166,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     server_options.crl_directory = key_cert_lib->crl_directory.c_str();
     server_options.client_certificate_request =
         TSI_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
-    server_options.session_ticket_key = ssl_fixture->session_ticket_key;
+    server_options.session_ticket_key = ssl_fixture->session_ticket_key.c_str();
     server_options.session_ticket_key_size =
         ssl_fixture->session_ticket_key_size;
     server_options.min_tls_version = test_tls_version;
