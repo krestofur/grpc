@@ -185,7 +185,7 @@ class CrlSslTransportSecurityTest
     bool expect_server_success = !(ssl_fixture->use_revoked_server_cert ||
                                    ssl_fixture->use_revoked_client_cert);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
-    bool expect_client_success = test_tls_version == tsi_tls_version::TSI_TLS1_2
+    bool expect_client_success = GetParam() == tsi_tls_version::TSI_TLS1_2
                                      ? expect_server_success
                                      : !(ssl_fixture->use_revoked_server_cert);
 #else
