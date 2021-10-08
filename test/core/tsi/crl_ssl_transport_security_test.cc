@@ -140,11 +140,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     } else {
       client_options.pem_key_cert_pair = key_cert_lib->valid_pem_key_cert_pairs;
     }
-<<<<<<< HEAD
     client_options.crl_directory = key_cert_lib->crl_directory.c_str();
-=======
-    client_options.crl_directory = key_cert_lib->crl_directory;
->>>>>>> 306821cd153709c7dd49c387fb17a32d56fdb990
 
     client_options.root_store = key_cert_lib->root_store;
     client_options.min_tls_version = test_tls_version;
