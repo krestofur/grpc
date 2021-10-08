@@ -272,7 +272,8 @@ INSTANTIATE_TEST_SUITE_P(TLSVersionsTest, CrlSslTransportSecurityTest,
 
 int main(int argc, char** argv) {
   grpc::testing::TestEnvironment env(argc, argv);
-  grpc_init();
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 
   // const size_t number_tls_versions = 2;
   // const tsi_tls_version tls_versions[] = {tsi_tls_version::TSI_TLS1_2,
@@ -287,6 +288,6 @@ int main(int argc, char** argv) {
   //     return test_result;
   //   };
   // }
-  grpc_shutdown();
-  return RUN_ALL_TESTS();
+  // grpc_shutdown();
+  // return RUN_ALL_TESTS();
 }
