@@ -59,15 +59,15 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs;
     uint16_t revoked_num_key_cert_pairs;
     uint16_t valid_num_key_cert_pairs;
-    const char* crl_directory;
+    const std::string crl_directory;
   };
 
   struct SslTsiTestFixture {
     tsi_test_fixture base;
     SslKeyCertLib* key_cert_lib;
-    char* server_name_indication;
+    std::string server_name_indication;
     bool session_reused;
-    const char* session_ticket_key;
+    const std::string session_ticket_key;
     size_t session_ticket_key_size;
     tsi_ssl_server_handshaker_factory* server_handshaker_factory;
     tsi_ssl_client_handshaker_factory* client_handshaker_factory;
