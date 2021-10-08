@@ -261,16 +261,13 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         ssl_fixture->client_handshaker_factory);
   }
 
-  static char* load_file(const char* dir_path, const char* file_name) {
-    char* file_path = static_cast<char*>(
-        gpr_zalloc(sizeof(char) * (strlen(dir_path) + strlen(file_name) + 1)));
-    memcpy(file_path, dir_path, strlen(dir_path));
-    memcpy(file_path + strlen(dir_path), file_name, strlen(file_name));
+  static char* load_file(absl::string_view dir_path,
+                         absl::string_view file_name) {
+    std::string file_path = dir_path + file_name;
     grpc_slice slice;
-    GPR_ASSERT(grpc_load_file(file_path, 1, &slice) == GRPC_ERROR_NONE);
+    GPR_ASSERT(grpc_load_file(file_path.c_str(), 1, &slice) == GRPC_ERROR_NONE);
     char* data = grpc_slice_to_c_string(slice);
     grpc_slice_unref(slice);
-    gpr_free(file_path);
     return data;
   }
 };
