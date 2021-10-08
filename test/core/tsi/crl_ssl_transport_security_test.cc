@@ -44,8 +44,9 @@ static const std::string kSslTsiTestCrlSupportedCredentialsDir =
 // Indicates the TLS version used for the test.
 static tsi_tls_version test_tls_version = tsi_tls_version::TSI_TLS1_3;
 
-class CrlSslTransportSecurityTest : public ::testing::Test {
- public:
+class CrlSslTransportSecurityTest
+    : public testing::TestWithParam<tsi_tls_version> {
+ protected:
   struct SslTsiTestFixture {
     tsi_test_fixture base;
     bool use_revoked_server_cert;
@@ -65,7 +66,6 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     tsi_ssl_client_handshaker_factory* client_handshaker_factory;
   };
 
- protected:
   void SetUp() override {
     // Set up the vtable.
     vtable_.setup_handshakers =
@@ -129,8 +129,8 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
     client_options.crl_directory = ssl_fixture->crl_directory.c_str();
 
     client_options.root_store = ssl_fixture->root_store;
-    client_options.min_tls_version = test_tls_version;
-    client_options.max_tls_version = test_tls_version;
+    client_options.min_tls_version = GetParam();
+    client_options.max_tls_version = GetParam();
     GPR_ASSERT(tsi_create_ssl_client_handshaker_factory_with_options(
                    &client_options, &ssl_fixture->client_handshaker_factory) ==
                TSI_OK);
@@ -250,18 +250,18 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
   }
 };
 
-TEST_F(CrlSslTransportSecurityTest,
+TEST_P(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_server_cert) {
   ssl_fixture_->use_revoked_server_cert = true;
   tsi_test_do_handshake(&ssl_fixture_->base);
 }
-TEST_F(CrlSslTransportSecurityTest,
+TEST_P(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_revoked_client_cert) {
   ssl_fixture_->use_revoked_client_cert = true;
   tsi_test_do_handshake(&ssl_fixture_->base);
 }
 
-TEST_F(CrlSslTransportSecurityTest,
+TEST_P(CrlSslTransportSecurityTest,
        ssl_tsi_test_do_handshake_with_valid_certs) {
   tsi_test_do_handshake(&ssl_fixture_->base);
 }
