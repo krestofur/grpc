@@ -102,15 +102,15 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
             gpr_malloc(sizeof(tsi_ssl_pem_key_cert_pair) *
                        key_cert_lib->valid_num_key_cert_pairs));
     key_cert_lib->revoked_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir + "revoked.key");
+        LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "revoked.key");
     key_cert_lib->revoked_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir + "revoked.pem");
+        LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "revoked.pem");
     key_cert_lib->valid_pem_key_cert_pairs[0].private_key =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir + "valid.key");
+        LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "valid.key");
     key_cert_lib->valid_pem_key_cert_pairs[0].cert_chain =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir + "valid.pem");
+        LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "valid.pem");
     key_cert_lib->root_cert =
-        load_file(kSslTsiTestCrlSupportedCredentialsDir + "ca.pem");
+        LoadFile(kSslTsiTestCrlSupportedCredentialsDir + "ca.pem");
     key_cert_lib->root_store =
         tsi_ssl_root_certs_store_create(key_cert_lib->root_cert);
     key_cert_lib->crl_directory = kSslTsiTestCrlSupportedCredentialsDir;
@@ -261,7 +261,7 @@ class CrlSslTransportSecurityTest : public ::testing::Test {
         ssl_fixture->client_handshaker_factory);
   }
 
-  static char* load_file(absl::string_view file_path) {
+  static char* LoadFile(absl::string_view file_path) {
     grpc_slice slice;
     GPR_ASSERT(grpc_load_file(file_path.data(), 1, &slice) == GRPC_ERROR_NONE);
     char* data = grpc_slice_to_c_string(slice);
