@@ -153,8 +153,8 @@ class CrlSslTransportSecurityTest
     server_options.session_ticket_key = ssl_fixture->session_ticket_key.c_str();
     server_options.session_ticket_key_size =
         ssl_fixture->session_ticket_key_size;
-    server_options.min_tls_version = test_tls_version;
-    server_options.max_tls_version = test_tls_version;
+    server_options.min_tls_version = GetParam();
+    server_options.max_tls_version = GetParam();
     GPR_ASSERT(tsi_create_ssl_server_handshaker_factory_with_options(
                    &server_options, &ssl_fixture->server_handshaker_factory) ==
                TSI_OK);
