@@ -341,10 +341,10 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args != nullptr);
   GPR_ASSERT(args->fixture != nullptr);
   tsi_test_fixture* fixture = args->fixture;
-  std::string log = "fixture->client_result: " + fixture->client_result ? "T"
-                    : "F" + ". fixture->server_result " + fixture->server_result
-                        ? "T"
-                        : "F";
+  std::string log = "fixture->client_result: ";
+  log += fixture->client_result ? "T" : "F";
+  log += ". fixture->server_result ";
+  log += fixture->server_result ? "T" : "F";
   gpr_log(GPR_INFO, log.c_str());
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
@@ -403,20 +403,21 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     if (client_args->error != GRPC_ERROR_NONE) {
       break;
     }
-    std::string log =
-        "client_args->transferred_data: " + client_args->transferred_data ? "T"
-        : "F" + ". server_args->transferred_data " +
-                server_args->transferred_data
-            ? "T"
-            : "F";
-    gpr_log(GPR_INFO, log);
+    std::string log = "client_args->transferred_data: ";
+    log += client_args->transferred_data ? "T" : "F";
+    log += ". server_args->transferred_data ";
+    log += server_args->transferred_data ? "T" : "F";
+
+    gpr_log(GPR_INFO, log.c_str());
     do_handshaker_next(server_args);
     if (server_args->error != GRPC_ERROR_NONE) {
       break;
     }
-    log = "client_args->transferred_data: " + client_args->transferred_data +
-          ". server_args->transferred_data " + server_args->transferred_data;
-    gpr_log(GPR_INFO, log);
+    log = "client_args->transferred_data: ";
+    log += client_args->transferred_data ? "T" : "F";
+    log += ". server_args->transferred_data ";
+    log += server_args->transferred_data ? "T" : "F";
+    gpr_log(GPR_INFO, log.c_str());
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
