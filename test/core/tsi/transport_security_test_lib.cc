@@ -343,7 +343,7 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   tsi_test_fixture* fixture = args->fixture;
   std::string log = "fixture->client_result: " + fixture->client_result +
                     ". fixture->server_result " + fixture->server_result;
-  GPR_LOG(INFO, log);
+  gpr_log(GPR_INFO, log);
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
 }
@@ -404,14 +404,14 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     std::string log =
         "client_args->transferred_data: " + client_args->transferred_data +
         ". server_args->transferred_data " + server_args->transferred_data;
-    GPR_LOG(INFO, log);
+    gpr_log(GPR_INFO, log);
     do_handshaker_next(server_args);
     if (server_args->error != GRPC_ERROR_NONE) {
       break;
     }
     log = "client_args->transferred_data: " + client_args->transferred_data +
           ". server_args->transferred_data " + server_args->transferred_data;
-    GPR_LOG(INFO, log);
+    gpr_log(GPR_INFO, log);
     GPR_ASSERT(client_args->transferred_data || server_args->transferred_data);
   } while (fixture->client_result == nullptr ||
            fixture->server_result == nullptr);
