@@ -345,7 +345,7 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   log += fixture->client_result == nullptr ? "nullptr" : "addr";
   log += ". fixture->server_result ";
   log += fixture->server_result == nullptr ? "nullptr" : "addr";
-  gpr_log(GPR_INFO, log.c_str());
+  gpr_log(GPR_INFO, "%s", log.c_str());
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
 }
