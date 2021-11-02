@@ -165,39 +165,26 @@ class CrlSslTransportSecurityTest
     }
 
     void CheckHandshakerPeers() {
-      // In TLS 1.3, the client-side handshake succeeds even if the client
-      // sends a revoked certificate. In such a case, the server would fail
-      // the TLS handshake and send an alert to the client as the first
-      // application data message. In TLS 1.2, the client-side handshake will
-      // fail if the client sends a revoked certificate.
+      // For OpenSSL versions >= 1.1, revocation enforcement is enabled and
+      // revoked certs should be denied.
       //
       // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the
       // client-side handshake should succeed precisely when the server-side
       // handshake succeeds.
-      bool expect_server_success =
+      bool expect_success =
           !(use_revoked_server_cert_ || use_revoked_client_cert_);
-#if OPENSSL_VERSION_NUMBER >= 0x10100000
-      bool expect_client_success = GetParam() == tsi_tls_version::TSI_TLS1_2
-                                       ? expect_server_success
-                                       : !use_revoked_server_cert_;
-#else
-      bool expect_client_success = expect_server_success;
-#endif
       tsi_peer peer;
-      if (expect_client_success) {
+      if (expect_success) {
         EXPECT_EQ(
             tsi_handshaker_result_extract_peer(base_.client_result, &peer),
             TSI_OK);
-        tsi_peer_destruct(&peer);
-      } else {
-        EXPECT_EQ(base_.client_result, nullptr);
-      }
-      if (expect_server_success) {
         EXPECT_EQ(
             tsi_handshaker_result_extract_peer(base_.server_result, &peer),
             TSI_OK);
+
         tsi_peer_destruct(&peer);
       } else {
+        EXPECT_EQ(base_.client_result, nullptr);
         EXPECT_EQ(base_.server_result, nullptr);
       }
     }
