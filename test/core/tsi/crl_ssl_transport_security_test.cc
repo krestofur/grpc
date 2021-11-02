@@ -171,17 +171,23 @@ class CrlSslTransportSecurityTest
       // For OpenSSL versions < 1.1, TLS 1.3 is not supported, so the
       // client-side handshake should succeed precisely when the server-side
       // handshake succeeds.
-      bool expect_success =
-          !(use_revoked_server_cert_ || use_revoked_client_cert_);
+      bool expect_success;
+      if (OPENSSL_VERSION_NUMBER >= 0x10100000) {
+        expect_success =
+            !(use_revoked_server_cert_ || use_revoked_client_cert_);
+      } else {
+        expect_success = true;
+      }
+
       tsi_peer peer;
       if (expect_success) {
         EXPECT_EQ(
             tsi_handshaker_result_extract_peer(base_.client_result, &peer),
             TSI_OK);
+        tsi_peer_destruct(&peer);
         EXPECT_EQ(
             tsi_handshaker_result_extract_peer(base_.server_result, &peer),
             TSI_OK);
-
         tsi_peer_destruct(&peer);
       } else {
         EXPECT_EQ(base_.client_result, nullptr);
