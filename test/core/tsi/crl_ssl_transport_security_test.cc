@@ -172,14 +172,15 @@ class CrlSslTransportSecurityTest
       // client-side handshake should succeed precisely when the server-side
       // handshake succeeds.
       bool expect_server_success;
+      bool expect_client_success;
       if (OPENSSL_VERSION_NUMBER >= 0x10100000) {
         expect_server_success =
             !(use_revoked_server_cert_ || use_revoked_client_cert_);
-        bool expect_client_success = GetParam() == tsi_tls_version::TSI_TLS1_2
-                                         ? expect_server_success
-                                         : !use_revoked_server_cert_;
+        expect_client_success = GetParam() == tsi_tls_version::TSI_TLS1_2
+                                    ? expect_server_success
+                                    : !use_revoked_server_cert_;
       } else {
-        bool expect_client_success = expect_server_success;
+        expect_client_success = expect_server_success;
       }
       tsi_peer peer;
       if (expect_client_success) {
