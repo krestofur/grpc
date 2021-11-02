@@ -342,9 +342,9 @@ static bool is_handshake_finished_properly(handshaker_args* args) {
   GPR_ASSERT(args->fixture != nullptr);
   tsi_test_fixture* fixture = args->fixture;
   std::string log = "fixture->client_result: ";
-  log += fixture->client_result ? "T" : "F";
+  log += fixture->client_result == nullptr ? "nullptr" : "addr";
   log += ". fixture->server_result ";
-  log += fixture->server_result ? "T" : "F";
+  log += fixture->server_result == nullptr ? "nullptr" : "addr";
   gpr_log(GPR_INFO, log.c_str());
   return (args->is_client && fixture->client_result != nullptr) ||
          (!args->is_client && fixture->server_result != nullptr);
