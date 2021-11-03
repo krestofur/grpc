@@ -85,6 +85,7 @@ class CrlSslTransportSecurityTest
                       bool use_revoked_client_cert)
         : use_revoked_server_cert_(use_revoked_server_cert),
           use_revoked_client_cert_(use_revoked_client_cert) {
+      tsi_test_fixture_init(&base_);
       base_.test_unused_bytes = true;
       base_.vtable = &kVtable;
       // Load cert data.
