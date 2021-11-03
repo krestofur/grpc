@@ -68,26 +68,18 @@ class CrlSslTransportSecurityTest
         gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(valid_pem_key_cert_pairs_[i]);
       }
-      gpr_log(GPR_INFO, "done loop #1");
       gpr_free(valid_pem_key_cert_pairs_);
-      gpr_log(GPR_INFO, "done free");
       for (size_t i = 0; i < kSslTsiTestRevokedKeyCertPairsNum; i++) {
         gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(revoked_pem_key_cert_pairs_[i]);
       }
-      gpr_log(GPR_INFO, "done loop #2");
 
       gpr_free(revoked_pem_key_cert_pairs_);
-      gpr_log(GPR_INFO, "done free");
 
       gpr_free(root_cert_);
-      gpr_log(GPR_INFO, "done free");
       tsi_ssl_root_certs_store_destroy(root_store_);
-      gpr_log(GPR_INFO, "done free");
       tsi_ssl_server_handshaker_factory_unref(server_handshaker_factory_);
-      gpr_log(GPR_INFO, "done free");
       tsi_ssl_client_handshaker_factory_unref(client_handshaker_factory_);
-      gpr_log(GPR_INFO, "done free");
     }
 
    private:
@@ -272,21 +264,18 @@ TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/true,
                                             /*use_revoked_client_cert=*/false);
   fixture->Run();
-  delete fixture;
 }
 
 TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
                                             /*use_revoked_client_cert=*/true);
   fixture->Run();
-  delete fixture;
 }
 
 TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
                                             /*use_revoked_client_cert=*/false);
   fixture->Run();
-  delete fixture;
 }
 
 std::string TestNameSuffix(
