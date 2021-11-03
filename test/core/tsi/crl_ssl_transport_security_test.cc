@@ -71,6 +71,12 @@ class CrlSslTransportSecurityTest
         : use_revoked_server_cert_(use_revoked_server_cert),
           use_revoked_client_cert_(use_revoked_client_cert) {
       tsi_test_fixture_init(&base_);
+      std::string log = "base_.client_result: ";
+      log += base_.client_result == nullptr ? "nullptr" : "addr";
+      log += ". base_.server_result ";
+      log += base_.server_result == nullptr ? "nullptr" : "addr";
+      gpr_log(GPR_INFO, "%s", log.c_str());
+
       base_.test_unused_bytes = true;
       base_.vtable = &kVtable;
       // Load cert data.
