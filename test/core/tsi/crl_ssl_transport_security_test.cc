@@ -186,10 +186,10 @@ class CrlSslTransportSecurityTest
         expect_client_success = expect_server_success;
       }
       tsi_peer peer;
-      std::string log = "base->client_result: ";
-      log += base->client_result == nullptr ? "nullptr" : "addr";
-      log += ". base->server_result ";
-      log += base->server_result == nullptr ? "nullptr" : "addr";
+      std::string log = "base_.client_result: ";
+      log += base_.client_result == nullptr ? "nullptr" : "addr";
+      log += ". base_.server_result ";
+      log += base_.server_result == nullptr ? "nullptr" : "addr";
       gpr_log(GPR_INFO, "%s", log.c_str());
 
       if (expect_client_success) {
