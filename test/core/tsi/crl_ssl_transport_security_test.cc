@@ -50,9 +50,6 @@ class CrlSslTransportSecurityTest
    public:
     static SslTsiTestFixture* Create(bool use_revoked_server_cert,
                                      bool use_revoked_client_cert) {
-      // fixture->base_.client_result = nullptr;
-      // fixture->base_.server_result = nullptr;
-
       return new SslTsiTestFixture(use_revoked_server_cert,
                                    use_revoked_client_cert);
     }
@@ -65,12 +62,10 @@ class CrlSslTransportSecurityTest
 
     ~SslTsiTestFixture() {
       for (size_t i = 0; i < kSslTsiTestValidKeyCertPairsNum; i++) {
-        gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(valid_pem_key_cert_pairs_[i]);
       }
       gpr_free(valid_pem_key_cert_pairs_);
       for (size_t i = 0; i < kSslTsiTestRevokedKeyCertPairsNum; i++) {
-        gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(revoked_pem_key_cert_pairs_[i]);
       }
 
@@ -87,18 +82,6 @@ class CrlSslTransportSecurityTest
                       bool use_revoked_client_cert)
         : use_revoked_server_cert_(use_revoked_server_cert),
           use_revoked_client_cert_(use_revoked_client_cert) {
-      std::string log = "base_.client_result: ";
-      log += base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". base_.server_result ";
-      log += base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
-      tsi_test_fixture_init(&base_);
-      log = "base_.client_result: ";
-      log += base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". base_.server_result ";
-      log += base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
-
       base_.test_unused_bytes = true;
       base_.vtable = &kVtable;
       // Load cert data.
@@ -172,11 +155,6 @@ class CrlSslTransportSecurityTest
       EXPECT_EQ(tsi_ssl_server_handshaker_factory_create_handshaker(
                     server_handshaker_factory_, &base_.server_handshaker),
                 TSI_OK);
-      std::string log = "base_.client_result: ";
-      log += base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". base_.server_result ";
-      log += base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
     }
 
     static void CheckHandshakerPeers(tsi_test_fixture* fixture) {
@@ -267,19 +245,17 @@ TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
   fixture->Run();
 }
 
-// TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
-//   auto* fixture =
-//   SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
-//                                             /*use_revoked_client_cert=*/true);
-//   fixture->Run();
-// }
+TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
+  auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
+                                            /*use_revoked_client_cert=*/true);
+  fixture->Run();
+}
 
-// TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
-//   auto* fixture =
-//   SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
-//                                             /*use_revoked_client_cert=*/false);
-//   fixture->Run();
-// }
+TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
+  auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
+                                            /*use_revoked_client_cert=*/false);
+  fixture->Run();
+}
 
 std::string TestNameSuffix(
     const ::testing::TestParamInfo<tsi_tls_version>& version) {
@@ -289,7 +265,8 @@ std::string TestNameSuffix(
 }
 
 INSTANTIATE_TEST_SUITE_P(TLSVersionsTest, CrlSslTransportSecurityTest,
-                         testing::Values(tsi_tls_version::TSI_TLS1_2),
+                         testing::Values(tsi_tls_version::TSI_TLS1_2,
+                                         tsi_tls_version::TSI_TLS1_3),
                          &TestNameSuffix);
 
 }  // namespace
