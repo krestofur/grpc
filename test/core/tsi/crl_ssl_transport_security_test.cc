@@ -52,11 +52,6 @@ class CrlSslTransportSecurityTest
                                      bool use_revoked_client_cert) {
       auto* fixture = static_cast<SslTsiTestFixture*>(
           gpr_malloc(sizeof(SslTsiTestFixture)));
-      std::string log = "fixture->base.client_result: ";
-      log += fixture->base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". fixture->base.server_result ";
-      log += fixture->base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
       new (fixture)
           SslTsiTestFixture(use_revoked_server_cert, use_revoked_client_cert);
       fixture->base_.client_result = nullptr;
