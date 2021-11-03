@@ -155,11 +155,6 @@ class CrlSslTransportSecurityTest
       EXPECT_EQ(tsi_ssl_server_handshaker_factory_create_handshaker(
                     server_handshaker_factory_, &base_.server_handshaker),
                 TSI_OK);
-      std::string log = "base_.client_result: ";
-      log += base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". base_.server_result ";
-      log += base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
     }
 
     static void CheckHandshakerPeers(tsi_test_fixture* fixture) {
