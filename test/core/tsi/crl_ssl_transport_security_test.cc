@@ -65,17 +65,29 @@ class CrlSslTransportSecurityTest
 
     ~SslTsiTestFixture() {
       for (size_t i = 0; i < kSslTsiTestValidKeyCertPairsNum; i++) {
+        gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(valid_pem_key_cert_pairs_[i]);
       }
+      gpr_log(GPR_INFO, "done loop #1");
       gpr_free(valid_pem_key_cert_pairs_);
+      gpr_log(GPR_INFO, "done free");
       for (size_t i = 0; i < kSslTsiTestRevokedKeyCertPairsNum; i++) {
+        gpr_log(GPR_INFO, "%d", i);
         PemKeyCertPairDestroy(revoked_pem_key_cert_pairs_[i]);
       }
+      gpr_log(GPR_INFO, "done loop #2");
+
       gpr_free(revoked_pem_key_cert_pairs_);
+      gpr_log(GPR_INFO, "done free");
+
       gpr_free(root_cert_);
+      gpr_log(GPR_INFO, "done free");
       tsi_ssl_root_certs_store_destroy(root_store_);
+      gpr_log(GPR_INFO, "done free");
       tsi_ssl_server_handshaker_factory_unref(server_handshaker_factory_);
+      gpr_log(GPR_INFO, "done free");
       tsi_ssl_client_handshaker_factory_unref(client_handshaker_factory_);
+      gpr_log(GPR_INFO, "done free");
     }
 
    private:
