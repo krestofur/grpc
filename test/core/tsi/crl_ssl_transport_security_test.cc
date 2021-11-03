@@ -76,7 +76,7 @@ class CrlSslTransportSecurityTest
       log += base_.server_result == nullptr ? "nullptr" : "addr";
       gpr_log(GPR_INFO, "%s", log.c_str());
       tsi_test_fixture_init(&base_);
-      std::string log = "base_.client_result: ";
+      log = "base_.client_result: ";
       log += base_.client_result == nullptr ? "nullptr" : "addr";
       log += ". base_.server_result ";
       log += base_.server_result == nullptr ? "nullptr" : "addr";
