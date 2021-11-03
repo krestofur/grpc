@@ -266,17 +266,19 @@ TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
   fixture->Run();
 }
 
-TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
-  auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
-                                            /*use_revoked_client_cert=*/true);
-  fixture->Run();
-}
+// TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
+//   auto* fixture =
+//   SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
+//                                             /*use_revoked_client_cert=*/true);
+//   fixture->Run();
+// }
 
-TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
-  auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
-                                            /*use_revoked_client_cert=*/false);
-  fixture->Run();
-}
+// TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
+//   auto* fixture =
+//   SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
+//                                             /*use_revoked_client_cert=*/false);
+//   fixture->Run();
+// }
 
 std::string TestNameSuffix(
     const ::testing::TestParamInfo<tsi_tls_version>& version) {
@@ -286,8 +288,7 @@ std::string TestNameSuffix(
 }
 
 INSTANTIATE_TEST_SUITE_P(TLSVersionsTest, CrlSslTransportSecurityTest,
-                         testing::Values(tsi_tls_version::TSI_TLS1_2,
-                                         tsi_tls_version::TSI_TLS1_3),
+                         testing::Values(tsi_tls_version::TSI_TLS1_2),
                          &TestNameSuffix);
 
 }  // namespace
