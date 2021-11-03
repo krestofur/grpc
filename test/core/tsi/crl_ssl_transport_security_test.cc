@@ -50,6 +50,11 @@ class CrlSslTransportSecurityTest
    public:
     static SslTsiTestFixture* Create(bool use_revoked_server_cert,
                                      bool use_revoked_client_cert) {
+      std::string log = "base_.client_result: ";
+      log += base_.client_result == nullptr ? "nullptr" : "addr";
+      log += ". base_.server_result ";
+      log += base_.server_result == nullptr ? "nullptr" : "addr";
+      gpr_log(GPR_INFO, "%s", log.c_str());
       // auto* fixture = static_cast<SslTsiTestFixture*>(
       //     gpr_malloc(sizeof(SslTsiTestFixture)));
       // new (fixture)
