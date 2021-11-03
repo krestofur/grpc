@@ -241,12 +241,12 @@ class CrlSslTransportSecurityTest
 
     bool use_revoked_server_cert_;
     bool use_revoked_client_cert_;
-    char* root_cert_;
-    tsi_ssl_root_certs_store* root_store_;
-    tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs_;
-    tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs_;
-    tsi_ssl_server_handshaker_factory* server_handshaker_factory_;
-    tsi_ssl_client_handshaker_factory* client_handshaker_factory_;
+    char* root_cert_ = nullptr;
+    tsi_ssl_root_certs_store* root_store_ = nullptr;
+    tsi_ssl_pem_key_cert_pair* revoked_pem_key_cert_pairs_ = nullptr;
+    tsi_ssl_pem_key_cert_pair* valid_pem_key_cert_pairs_ = nullptr;
+    tsi_ssl_server_handshaker_factory* server_handshaker_factory_ = nullptr;
+    tsi_ssl_client_handshaker_factory* client_handshaker_factory_ = nullptr;
   };
 };
 
