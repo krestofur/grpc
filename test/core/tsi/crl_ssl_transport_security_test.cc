@@ -63,6 +63,21 @@ class CrlSslTransportSecurityTest
     }
     tsi_test_fixture base_;
 
+    ~SslTsiTestFixture() {
+      for (size_t i = 0; i < kSslTsiTestValidKeyCertPairsNum; i++) {
+        PemKeyCertPairDestroy(valid_pem_key_cert_pairs_[i]);
+      }
+      gpr_free(valid_pem_key_cert_pairs_);
+      for (size_t i = 0; i < kSslTsiTestRevokedKeyCertPairsNum; i++) {
+        PemKeyCertPairDestroy(revoked_pem_key_cert_pairs_[i]);
+      }
+      gpr_free(revoked_pem_key_cert_pairs_);
+      gpr_free(root_cert_);
+      tsi_ssl_root_certs_store_destroy(root_store_);
+      tsi_ssl_server_handshaker_factory_unref(server_handshaker_factory_);
+      tsi_ssl_client_handshaker_factory_unref(client_handshaker_factory_);
+    }
+
    private:
     SslTsiTestFixture(bool use_revoked_server_cert,
                       bool use_revoked_client_cert)
@@ -101,21 +116,6 @@ class CrlSslTransportSecurityTest
           absl::StrCat(kSslTsiTestCrlSupportedCredentialsDir, "ca.pem"));
       root_store_ = tsi_ssl_root_certs_store_create(root_cert_);
       GPR_ASSERT(root_store_ != nullptr);
-    }
-
-    ~SslTsiTestFixture() {
-      for (size_t i = 0; i < kSslTsiTestValidKeyCertPairsNum; i++) {
-        PemKeyCertPairDestroy(valid_pem_key_cert_pairs_[i]);
-      }
-      gpr_free(valid_pem_key_cert_pairs_);
-      for (size_t i = 0; i < kSslTsiTestRevokedKeyCertPairsNum; i++) {
-        PemKeyCertPairDestroy(revoked_pem_key_cert_pairs_[i]);
-      }
-      gpr_free(revoked_pem_key_cert_pairs_);
-      gpr_free(root_cert_);
-      tsi_ssl_root_certs_store_destroy(root_store_);
-      tsi_ssl_server_handshaker_factory_unref(server_handshaker_factory_);
-      tsi_ssl_client_handshaker_factory_unref(client_handshaker_factory_);
     }
 
     static void SetupHandshakers(tsi_test_fixture* fixture) {
@@ -260,18 +260,21 @@ TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/true,
                                             /*use_revoked_client_cert=*/false);
   fixture->Run();
+  delete fixture;
 }
 
 TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
                                             /*use_revoked_client_cert=*/true);
   fixture->Run();
+  delete fixture;
 }
 
 TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
                                             /*use_revoked_client_cert=*/false);
   fixture->Run();
+  delete fixture;
 }
 
 std::string TestNameSuffix(
