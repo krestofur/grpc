@@ -390,12 +390,18 @@ static void do_handshaker_next(handshaker_args* args) {
 
 void tsi_test_do_handshake(tsi_test_fixture* fixture) {
   /* Initializaiton. */
+  std::string log = "fixture->client_result: ";
+  log += fixture->client_result == nullptr ? "nullptr" : "addr";
+  log += ". fixture->server_result ";
+  log += fixture->server_result == nullptr ? "nullptr" : "addr";
+  gpr_log(GPR_INFO, "%s", log.c_str());
+
   setup_handshakers(fixture);
   handshaker_args* client_args =
       handshaker_args_create(fixture, true /* is_client */);
   handshaker_args* server_args =
       handshaker_args_create(fixture, false /* is_client */);
-  std::string log = "fixture->client_result: ";
+  log = "fixture->client_result: ";
   log += fixture->client_result == nullptr ? "nullptr" : "addr";
   log += ". fixture->server_result ";
   log += fixture->server_result == nullptr ? "nullptr" : "addr";
