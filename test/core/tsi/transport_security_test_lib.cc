@@ -395,6 +395,11 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
       handshaker_args_create(fixture, true /* is_client */);
   handshaker_args* server_args =
       handshaker_args_create(fixture, false /* is_client */);
+  std::string log = "fixture->client_result: ";
+  log += fixture->client_result == nullptr ? "nullptr" : "addr";
+  log += ". fixture->server_result ";
+  log += fixture->server_result == nullptr ? "nullptr" : "addr";
+  gpr_log(GPR_INFO, "%s", log.c_str());
   /* Do handshake. */
   do {
     client_args->transferred_data = false;
@@ -403,7 +408,7 @@ void tsi_test_do_handshake(tsi_test_fixture* fixture) {
     if (client_args->error != GRPC_ERROR_NONE) {
       break;
     }
-    std::string log = "client_args->transferred_data: ";
+    log = "client_args->transferred_data: ";
     log += client_args->transferred_data ? "T" : "F";
     log += ". server_args->transferred_data ";
     log += server_args->transferred_data ? "T" : "F";
