@@ -50,11 +50,6 @@ class CrlSslTransportSecurityTest
    public:
     static SslTsiTestFixture* Create(bool use_revoked_server_cert,
                                      bool use_revoked_client_cert) {
-      std::string log = "base_.client_result: ";
-      log += base_.client_result == nullptr ? "nullptr" : "addr";
-      log += ". base_.server_result ";
-      log += base_.server_result == nullptr ? "nullptr" : "addr";
-      gpr_log(GPR_INFO, "%s", log.c_str());
       // auto* fixture = static_cast<SslTsiTestFixture*>(
       //     gpr_malloc(sizeof(SslTsiTestFixture)));
       // new (fixture)
@@ -69,6 +64,7 @@ class CrlSslTransportSecurityTest
       tsi_test_do_handshake(&base_);
       tsi_test_fixture_destroy(&base_);
     }
+    tsi_test_fixture base_;
 
    private:
     SslTsiTestFixture(bool use_revoked_server_cert,
@@ -247,7 +243,6 @@ class CrlSslTransportSecurityTest
 
     static struct tsi_test_fixture_vtable kVtable;
 
-    tsi_test_fixture base_;
     bool use_revoked_server_cert_;
     bool use_revoked_client_cert_;
     char* root_cert_;
@@ -266,6 +261,12 @@ struct tsi_test_fixture_vtable
         &CrlSslTransportSecurityTest::SslTsiTestFixture::Destruct};
 
 TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
+  std::string log = "base_.client_result: ";
+  log += base_.client_result == nullptr ? "nullptr" : "addr";
+  log += ". base_.server_result ";
+  log += base_.server_result == nullptr ? "nullptr" : "addr";
+  gpr_log(GPR_INFO, "%s", log.c_str());
+
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/true,
                                             /*use_revoked_client_cert=*/false);
   fixture->Run();
