@@ -207,8 +207,7 @@ class CrlSslTransportSecurityTest
 
     static void Destruct(tsi_test_fixture* fixture) {
       auto* self = reinterpret_cast<SslTsiTestFixture*>(fixture);
-      // self->~SslTsiTestFixture();
-      delete self;
+      self->~SslTsiTestFixture();
     }
 
     static char* LoadFile(absl::string_view file_path) {
