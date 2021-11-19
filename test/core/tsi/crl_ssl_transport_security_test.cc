@@ -248,13 +248,11 @@ TEST_P(CrlSslTransportSecurityTest, RevokedServerCert) {
   fixture->Run();
 }
 
-/*TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
-  auto* fixture = SslTsiTestFixture::Create(*/
-/*use_revoked_server_cert=*//*false,
-                             */
-/*use_revoked_client_cert=*//*true);
-fixture->Run();
-}*/
+TEST_P(CrlSslTransportSecurityTest, RevokedClientCert) {
+  auto* fixture = SslTsiTestFixture::Create(use_revoked_server_cert = false,
+                                            use_revoked_client_cert = true);
+  fixture->Run();
+}
 
 TEST_P(CrlSslTransportSecurityTest, ValidCerts) {
   auto* fixture = SslTsiTestFixture::Create(/*use_revoked_server_cert=*/false,
