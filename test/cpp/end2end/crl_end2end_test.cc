@@ -97,7 +97,7 @@ class TestServerWrapper {
         std::make_shared<FileWatcherCertificateProvider>(
             key_file, certificate_file, ca_bundle_file,
             /*refresh_interval_sec=*/10);
-    TlsServerCredentialsOptions options(certificate_provider);
+    TlsServerCredentialsOptions options();
     // options.watch_root_certs();
     // options.watch_identity_key_cert_pairs();
     // options.set_cert_request_type(
