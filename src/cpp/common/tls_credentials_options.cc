@@ -59,6 +59,11 @@ void TlsCredentialsOptions::set_identity_cert_name(
       c_credentials_options_, identity_cert_name.c_str());
 }
 
+void TlsCredentialsOptions::set_crl_directory(const std::string& path) {
+  grpc_tls_credentials_options_set_crl_directory(c_credentials_options_,
+                                                 path.c_str());
+}
+
 void TlsCredentialsOptions::set_certificate_verifier(
     std::shared_ptr<CertificateVerifier> certificate_verifier) {
   certificate_verifier_ = std::move(certificate_verifier);
