@@ -62,43 +62,43 @@ void TlsCredentialsOptions::set_identity_cert_name(
 void TlsCredentialsOptions::set_crl_directory(const std::string& path) {
   grpc_tls_credentials_options_set_crl_directory(c_credentials_options_,
                                                  path.c_str());
-  
-void TlsCredentialsOptions::set_tls_session_key_log_file_path(
-    const std::string& tls_session_key_log_file_path) {
-  grpc_tls_credentials_options_set_tls_session_key_log_file_path(
-      c_credentials_options_, tls_session_key_log_file_path.c_str());
-}
 
-void TlsCredentialsOptions::set_certificate_verifier(
-    std::shared_ptr<CertificateVerifier> certificate_verifier) {
-  certificate_verifier_ = std::move(certificate_verifier);
-  if (certificate_verifier_ != nullptr) {
-    grpc_tls_credentials_options_set_certificate_verifier(
-        c_credentials_options_, certificate_verifier_->c_verifier());
+  void TlsCredentialsOptions::set_tls_session_key_log_file_path(
+      const std::string& tls_session_key_log_file_path) {
+    grpc_tls_credentials_options_set_tls_session_key_log_file_path(
+        c_credentials_options_, tls_session_key_log_file_path.c_str());
   }
-}
 
-void TlsCredentialsOptions::set_check_call_host(bool check_call_host) {
-  grpc_tls_credentials_options* options = c_credentials_options();
-  GPR_ASSERT(options != nullptr);
-  grpc_tls_credentials_options_set_check_call_host(options, check_call_host);
-}
+  void TlsCredentialsOptions::set_certificate_verifier(
+      std::shared_ptr<CertificateVerifier> certificate_verifier) {
+    certificate_verifier_ = std::move(certificate_verifier);
+    if (certificate_verifier_ != nullptr) {
+      grpc_tls_credentials_options_set_certificate_verifier(
+          c_credentials_options_, certificate_verifier_->c_verifier());
+    }
+  }
 
-void TlsChannelCredentialsOptions::set_verify_server_certs(
-    bool verify_server_certs) {
-  grpc_tls_credentials_options* options = c_credentials_options();
-  GPR_ASSERT(options != nullptr);
-  grpc_tls_credentials_options_set_verify_server_cert(options,
-                                                      verify_server_certs);
-}
+  void TlsCredentialsOptions::set_check_call_host(bool check_call_host) {
+    grpc_tls_credentials_options* options = c_credentials_options();
+    GPR_ASSERT(options != nullptr);
+    grpc_tls_credentials_options_set_check_call_host(options, check_call_host);
+  }
 
-void TlsServerCredentialsOptions::set_cert_request_type(
-    grpc_ssl_client_certificate_request_type cert_request_type) {
-  grpc_tls_credentials_options* options = c_credentials_options();
-  GPR_ASSERT(options != nullptr);
-  grpc_tls_credentials_options_set_cert_request_type(options,
-                                                     cert_request_type);
-}
+  void TlsChannelCredentialsOptions::set_verify_server_certs(
+      bool verify_server_certs) {
+    grpc_tls_credentials_options* options = c_credentials_options();
+    GPR_ASSERT(options != nullptr);
+    grpc_tls_credentials_options_set_verify_server_cert(options,
+                                                        verify_server_certs);
+  }
+
+  void TlsServerCredentialsOptions::set_cert_request_type(
+      grpc_ssl_client_certificate_request_type cert_request_type) {
+    grpc_tls_credentials_options* options = c_credentials_options();
+    GPR_ASSERT(options != nullptr);
+    grpc_tls_credentials_options_set_cert_request_type(options,
+                                                       cert_request_type);
+  }
 
 }  // namespace experimental
-}  // namespace grpc
+}  // namespace experimental
