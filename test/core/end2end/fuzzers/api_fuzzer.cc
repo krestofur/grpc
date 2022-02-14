@@ -340,6 +340,16 @@ class Call : public std::enable_shared_from_this<Call> {
   void Shutdown() {
     if (call_ != nullptr) {
       grpc_call_cancel(call_, nullptr);
+      if (type_ == CallType::CLIENT && !started_recv_status_on_client_) {
+        uint8_t has_ops = 0;
+        grpc_op op = MakeRecvStatusOnClientOp(&has_ops);
+        auto* v = FinishedBatchValidator(has_ops);
+        grpc_call_error error =
+            grpc_call_start_batch(call_, &op, 1, v, nullptr);
+        if (error != GRPC_CALL_OK) {
+          v->Run(false);
+        }
+      }
       type_ = CallType::TOMBSTONED;
     }
   }
@@ -481,12 +491,9 @@ class Call : public std::enable_shared_from_this<Call> {
         }
         break;
       case api_fuzzer::BatchOp::kReceiveStatusOnClient:
-        op.op = GRPC_OP_RECV_STATUS_ON_CLIENT;
-        op.data.recv_status_on_client.status = &status_;
-        op.data.recv_status_on_client.trailing_metadata =
-            &recv_trailing_metadata_;
-        op.data.recv_status_on_client.status_details = &recv_status_details_;
-        *batch_ops |= 1 << GRPC_OP_RECV_STATUS_ON_CLIENT;
+        op = MakeRecvStatusOnClientOp(batch_ops);
+        unwinders->push_back(
+            [this]() { started_recv_status_on_client_ = false; });
         break;
       case api_fuzzer::BatchOp::kReceiveCloseOnServer:
         op.op = GRPC_OP_RECV_CLOSE_ON_SERVER;
@@ -538,6 +545,18 @@ class Call : public std::enable_shared_from_this<Call> {
   }
 
  private:
+  grpc_op MakeRecvStatusOnClientOp(uint8_t* batch_ops) {
+    grpc_op op;
+    memset(&op, 0, sizeof(op));
+    op.op = GRPC_OP_RECV_STATUS_ON_CLIENT;
+    op.data.recv_status_on_client.status = &status_;
+    op.data.recv_status_on_client.trailing_metadata = &recv_trailing_metadata_;
+    op.data.recv_status_on_client.status_details = &recv_status_details_;
+    *batch_ops |= 1 << GRPC_OP_RECV_STATUS_ON_CLIENT;
+    started_recv_status_on_client_ = true;
+    return op;
+  }
+
   CallType type_;
   grpc_call* call_ = nullptr;
   grpc_byte_buffer* recv_message_ = nullptr;
@@ -553,8 +572,9 @@ class Call : public std::enable_shared_from_this<Call> {
   bool enqueued_recv_initial_metadata_ = false;
   grpc_call_details call_details_{};
   grpc_byte_buffer* send_message_ = nullptr;
-  bool call_closed_ = false;
   bool pending_recv_message_op_ = false;
+  bool started_recv_status_on_client_ = false;
+  bool call_closed_ = false;
 
   std::vector<void*> free_pointers_;
   std::vector<grpc_slice> unref_slices_;
@@ -868,16 +888,13 @@ DEFINE_PROTO_FUZZER(const api_fuzzer::Msg& msg) {
         } else {
           grpc_channel_args* args =
               ReadArgs(action.create_channel().channel_args());
-          if (action.create_channel().has_channel_creds()) {
-            grpc_channel_credentials* creds =
-                ReadChannelCreds(action.create_channel().channel_creds());
-            g_channel = grpc_secure_channel_create(
-                creds, action.create_channel().target().c_str(), args, nullptr);
-            grpc_channel_credentials_release(creds);
-          } else {
-            g_channel = grpc_insecure_channel_create(
-                action.create_channel().target().c_str(), args, nullptr);
-          }
+          grpc_channel_credentials* creds =
+              action.create_channel().has_channel_creds()
+                  ? ReadChannelCreds(action.create_channel().channel_creds())
+                  : grpc_insecure_credentials_create();
+          g_channel = grpc_channel_create(
+              action.create_channel().target().c_str(), creds, args);
+          grpc_channel_credentials_release(creds);
           g_channel_actions.clear();
           for (int i = 0; i < action.create_channel().channel_actions_size();
                i++) {
