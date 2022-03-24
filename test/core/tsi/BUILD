@@ -90,6 +90,7 @@ grpc_cc_test(
     data = [
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r0",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r1",
+        "//test/core/tsi/test_creds/crl_data:ab06acdd.r10",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r2",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r3",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r4",
@@ -98,7 +99,6 @@ grpc_cc_test(
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r7",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r8",
         "//test/core/tsi/test_creds/crl_data:ab06acdd.r9",
-        "//test/core/tsi/test_creds/crl_data:ab06acdd.r10",
         "//test/core/tsi/test_creds/crl_data:ca.pem",
         "//test/core/tsi/test_creds/crl_data:revoked.key",
         "//test/core/tsi/test_creds/crl_data:revoked.pem",
